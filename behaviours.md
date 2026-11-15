@@ -24,7 +24,8 @@ the rest are `unk_<offset>`.
 | Settings features SR_QUICK_CAST, SR_RESISTANCE_GLOW, SR_UPSCALING | 3 loaders in appended code | decoded (B8) |
 | Hooks into appended code | 43 hooks in 25 functions, 38 targets | characterised (B9) |
 | "Branch changes" | 63 | 46 are jumps into appended code (mostly UI / hd), 17 are condition flips (B10) |
-| Other code hunks | about 230 | not decoded |
+| Widening to 32 bits, level tiers, combat constants, spell numbers, small edits | about 140 | decoded or characterised (B11-B15) |
+| UI, loading, rendering (HD) | about 150 | engine (B16) |
 
 ## B1/B2 The ability table: one id-keyed `gear.data.abilities[id]`
 
@@ -168,6 +169,74 @@ Decoded so far: the quick-cast call (B8), the effect-entry hook (B6). The others
 and the other caves; they sit mostly in UI and startup functions (`dxDriver7_drawLoadingScreen` `0x6468A0`, `cUI_Manager::createGameWindows`
 `0x759AF0`, window constructors `0x6C9F60`, `0x6CCBD0`, `0x6A4F30`, `0x6E7AF0`, `0x722500`): HD layout, engine. 17 are condition flips
 (`ja -> jbe` x4 in `FUN_005abd80` (B7), `jne -> je` x3, `je -> jmp` x5, ...); each needs its context read.
+
+## B11 Damage and effect values widened to 32 bits (about 60 hunks in 11 functions) - decoded
+
+Vanilla keeps damage, effect and level values in 16-bit (and 8-bit) slots and clamps them: `cmp eax, 0xFFFE; jbe ...; mov eax, 0xFFFE`
+(65534), `and ebx, 0xFFFF`, `mov dword [esp+0x34], 0xEFFF`, and the hero's skill level `[creature+0x249]` is a byte. ReBorn changes the slots to
+32 bits (`mov word [esp+0xAC], ax` -> `mov dword [esp+0xAC], eax`, `mov dl, [ebp+0x249]` -> dword) and removes the clamps (the `cmp/mov 0xFFFE`
+instructions become nops). Functions: `FUN_0050E6C0` (13 hunks), `FUN_00514790`, `FUN_0055FE20`, `FUN_00562730`, `FUN_0056B130`, `FUN_005AA7E0`,
+`FUN_005B2600`, `FUN_005BB010`, `FUN_00582D50`, `FUN_00571710`, the stack-slot shift of B7 (`FUN_005ABD80`) belongs here too. Effect: damage and
+effect values above 65534 do not wrap or saturate, which the item and ability numbers of ReBorn's balance (T1/T2 values, `balance.bin` limits
+`5500..8500 -> 2000`) rely on. **Not re-creatable from data**: the widths are in the engine's structures. A Lua version needs a damage hook that
+returns a 32-bit value; see the hooks below.
+
+## B12 Level tiers instead of a smooth level function (5 hunks) - decoded
+
+`FUN_0051CC30` (and its three inlined copies in `FUN_0050E6C0` x2 and `FUN_005893B0` x3) turn a level into a factor. Vanilla:
+`(34 * L + 8) / (c1 * L + c2)` (a smooth rational function, constants `0x88F0B4` = 34.0, `0x88E918` = 8.0, `0x88E9EC`, `0x88F0B0`).
+ReBorn: integer tiers, `1 + (L > 12) + (L > 24) + (L > 36)`: 1 up to level 12, 2 up to 24, 3 up to 36, 4 above. The same replacement at all
+five sites, so one Lua function (tier of a level) is enough, but it has to be used by the engine: **hook** `gear.on('level.factor', level) -> n`
+(this is also what the functions around those sites compute: monster level scaling).
+
+## B13 Combat constants moved to a table in the PE header (about 20 hunks) - decoded
+
+`fmul dword [0x88EDA0]` (0.2) -> `[0x400B25]` (1.0) in `FUN_005038F0`, `FUN_00506770`, `FUN_0050AC00` and `FUN_0050E6C0` (the four hit
+handlers, together with a branch each: `jne -> je` / `je -> jmp` that skips a condition), and `fmul dword [0x88ECB0]` (0.01) ->
+`[0x400FC4]` (0.01) / `[0x400FC8]` (0.05) in `FUN_00559BF0` (three sites), `FUN_0056B130` -> a jump into appended code.
+`FUN_0056B130` also loads five factors `1.0, 1.34, 1.67, 2.0, 2.34` (`0x88E66C, 0x88EDF0, 0x88EDEC, 0x88E750, 0x88EDE8`) from ReBorn's
+table as `1.06, 1.08, 1.10, 1.12, 1.14` (`0x400FAF..0x400FBF`): the per-difficulty or per-tier damage factors become much flatter.
+Needs the constants exposed: **API** `gear.data.constants` (named float table of the exe's combat constants) or the damage hook.
+
+## B14 Spell parameters inside the effect function `FUN_00571710` (12 hunks) - characterised
+
+Immediate values pushed as arguments for individual spells change: `5 -> 0x14` (x2), `0xF -> 0x14` and `0xF -> 0x78`, `0x482 -> 0x496`
+(a text/id), the float `0.15 (0x3E19999A) -> 0.2 (0x3E4CCCCD)` four times and one `0.15 -> 1.2 (0x3F99999A)`, and one call
+(`push 0x44F; call 0x4D1930 ...` -> `push 0x35D; ... call 0x672F70`: a different text is shown). These are spell-specific numbers that are
+not in the T2 table. Needs a hook around the spell effect (named per spell) or the constants as data.
+
+## B15 Small constant and condition changes - decoded (each a few bytes)
+
+| Site (ENG) | Vanilla | ReBorn | Note |
+|---|---|---|---|
+| `0x4D324D` (`FUN_004D31C0`) | `rand & 0x2F` + 5 | `rand & 0x1A` + 0x1A | a random roll: range 5..52 -> 26..52 |
+| `0x5CACFB`..`0x5CB6A1` (`FUN_005CA9E0`) | 0x32, 0x19 | 0x64, 0x64 | two percent values 50 and 25 become 100; `or eax, 0x8000000` removed |
+| `0x428780`, `0x440D00` | `cmp eax, 0x17BB` | `0x15F4` | an id limit 6075 -> 5620 |
+| `0x51D150`, `0x52E460` | 0x40 | 0x44 | a constant 64 -> 68 (same value at two places) |
+| `0x5E0710` | `[ebp+0x120C] = 5` | 0xC | a count |
+| `0x51DA04` (`FUN_0051D840`) | `jge` | `je` | a condition |
+| `0x426E80` (`FUN_00426E80`) | `cmp eax, 0x8A; ja` | `cmp edx, 6; je` | a creature-type range test replaced by an equality test; two id results 0x221 -> 0x257, 0x49 / 0x259 |
+| `0x580CB9`, `0x580D21` | 0x10E | 0x6F | a 270 -> 111 offset and compare |
+
+## B16 What is UI or rendering (not gameplay)
+
+About 150 more hunks are the HD work again and covered by SacredBild: the loading screen (`0x6468A0`), the help screens (`0x75B4F0`), window
+constructors (`0x6C9F60`, `0x6CB530`, `0x6CCBD0`, `0x6E7AF0`, `0x6EB3E0`, `0x6AC310`, `0x6B2B10`, `0x710270`), the world view (`0x62AE90`, `0x62FF60`),
+`cUI_Manager` creation (`0x759AF0`) and the engine frame (`0x60DD20`), plus the 12 jumps from `FUN_00618090` and 3 from `FUN_00757840` (the
+event handlers; the quick cast cave is called from the skill-slot handler `0x6E1BC0`, B8).
+
+## Proposed named hooks (one list, to confirm before any is implemented)
+
+| Hook / API | What it carries | Behaviours |
+|---|---|---|
+| `gear.on('creature.ability', c, id) -> id` | the creature AI's choice of ability (T2 id or T1 id) | B6 |
+| `gear.on('damage', hit) -> hit` | a hit before it is applied: attacker, victim, damage type table (32-bit values), ability id, base value; may change values | B11, B13 |
+| `gear.on('level.factor', level) -> number` | the factor the engine derives from a level (monster scaling) | B12 |
+| `gear.data.constants` | named float / int table of the exe's combat constants (`hit_factor_a`, `difficulty_factors[5]` ...), validated writes | B13, B14, B15 |
+| `gear.on('effect.add', creature, effect) -> effect` | the effect-entry function `FUN_00562330` (add to a creature's effect entry, clamp to its maximum) | B6, B9 |
+| `gear.input.click(x, y)` and `gear.on('skillslot.key', slot)` | a synthetic click at a position; the skill-slot key press | B8 quick cast |
+| `gear.on('spell.cast', creature, id, params) -> params` | the per-spell numbers inside `FUN_00571710` | B14 |
+| widening of damage values | **engine**: not a data change; the damage hook returns 32-bit values and Gear must keep them where the engine reads them | B11 |
 
 ## Gear APIs: done and still to do
 
