@@ -12,6 +12,7 @@ import argparse, bisect, hashlib, json, os, re, struct, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import capstone
 from exeimg import Image, FuncTable, masked, cs
+from analysis import write_analysis
 
 # ReBorn's globals for the screen size and everything derived from it (a block in the zero-filled part of .data)
 HD_GLOBALS = (0xA1EF00, 0xA1F200)
@@ -52,7 +53,9 @@ def main():
     ap.add_argument('--map', required=True, help="map_de_eng.json (tools/map_de_eng.py of sacred-bild)")
     ap.add_argument('--vanilla', help="vanilla German install folder (default: the folder of --base)")
     ap.add_argument('--bild-sites', help="sacred-bild's src/game/resolution_sites.inc (marks patches on its sites)")
-    ap.add_argument('--out', default='mods/reborn')
+    ap.add_argument('--eng-names', help="sacred-bild's tools/data/functions_eng.tsv (function names)")
+    ap.add_argument('--decomp', help="decomp-sacred folder (English decompile)")
+    ap.add_argument('--out', default='out')
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
@@ -67,6 +70,7 @@ def main():
     de_funcs = {f[0]: f for f in fmap['functions']}
     ft = FuncTable(de, de_funcs.keys())
     gmap = {int(k, 16): int(v[0], 16) for k, v in fmap['globals'].items()}
+    gkeys = sorted(k for k in gmap if de.section_of(k) in ('.rdata', '.data'))
     gkeys = sorted(k for k in gmap if de.section_of(k) in ('.rdata', '.data'))
     bild = set()
     if args.bild_sites and os.path.exists(args.bild_sites):
@@ -194,16 +198,16 @@ def main():
             hits = [m.start() for m in rx.finditer(bytes(eng.img))]
             if len(hits) == 1:
                 status, eng_va = 'auto', eng.base + hits[0] + 16
-            elif len(hits) > 1 and gkeys:
-                # repeating records: take the hit that keeps the offset of the nearest paired global (tables move
-                # by a constant between the builds)
-                k = bisect.bisect_left(gkeys, p['de'])
-                near = [gkeys[i] for i in (k - 1, k) if 0 <= i < len(gkeys) and abs(gkeys[i] - p['de']) <= 0x400]
-                if near:
-                    a = min(near, key=lambda x: abs(x - p['de']))
-                    want = p['de'] + (gmap[a] - a)
-                    good = [h for h in hits if eng.base + h + 16 == want]
-                    if len(good) == 1:
+            elif gkeys:
+                # repeating records: the table keeps its layout, so the nearest paired global below the patch gives the
+                # offset between the builds; accepted when the vanilla bytes around the patch agree there
+                k = bisect.bisect_right(gkeys, p['de']) - 1
+                while k >= 0 and de.section_of(gkeys[k]) != sec:
+                    k -= 1
+                if k >= 0:
+                    g = gkeys[k]
+                    want = p['de'] + (gmap[g] - g)
+                    if eng.rd(want - 16, 16 + p['len'] + 16) == de.rd(p['de'] - 16, 16 + p['len'] + 16):
                         status, eng_va = 'auto', want
         p['eng'] = eng_va
         p['status'] = status
@@ -225,7 +229,7 @@ def main():
         d['new'] = p['new'].hex()
         return d
 
-    with open(os.path.join(args.out, 'patches.json'), 'w', newline='\n') as f:
+    with open(os.path.join(args.out, 'hunks.json'), 'w', newline='\n') as f:
         json.dump({'base': os.path.basename(args.base), 'target': os.path.basename(args.target),
                    'patches': [jp(p) for p in patches], 'caves': [f'{c:08X}' for c in caves]}, f, indent=0)
     with open(os.path.join(args.out, 'manifest.json'), 'w', newline='\n') as f:
@@ -234,17 +238,7 @@ def main():
     by = {}
     for p in patches:
         by.setdefault(p['class'], {'auto': 0, 'review': 0})[p['status']] += 1
-    lines = ['# ReBorn port report', '', f'{len(patches)} patches, {len(caves)} cave entry points, '
-             f'{len(manifest["files"])} data files', '', '| class | patches | auto | review |', '|---|---|---|---|']
-    for cls, c in sorted(by.items()):
-        lines.append(f'| {cls} | {c["auto"] + c["review"]} | {c["auto"]} | {c["review"]} |')
-    lines += ['', '## Patches', '', '| DE | ENG | len | section | function | class | status |', '|---|---|---|---|---|---|---|']
-    for p in patches:
-        eng_s = f"{p['eng']:08X}" if p['eng'] else '-'
-        fn_s = f"{p['func']:08X}" if p['func'] else '-'
-        lines.append(f"| {p['de']:08X} | {eng_s} | {p['len']} | {p['section']} | {fn_s} | {p['class']} | {p['status']} |")
-    with open(os.path.join(args.out, 'report.md'), 'w', newline='\n') as f:
-        f.write('\n'.join(lines) + '\n')
+    write_analysis(args, patches, de, rb, eng, fmap, gmap, caves, manifest, by)
     print(json.dumps({'patches': len(patches), 'by_class': by, 'caves': len(caves), 'data_files': len(manifest['files'])}))
 
 

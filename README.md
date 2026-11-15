@@ -20,7 +20,10 @@ python tools/reborn_port.py --reborn "<ReBorn folder>" --base "<German sacred.ex
     --map <sacred-bild>/tools/data/map_de_eng.json --out mods/reborn
 ```
 
-Output: `patches.json`, `manifest.json` (data files with SHA-256), `report.md` (one row per patch: German and English
-address, function, class, status `auto` / `review`).
+Output: `hunks.json` (every hunk with its German and English address, class and bytes), `analysis.md` (per English
+function and data table: vanilla and ReBorn disassembly side by side, decompile location), `manifest.json` (data files
+with SHA-256). The hunks are **not applied** to a game: ReBorn is re-created as Lua on Sacred Gear's APIs, and
+`behaviours.md` lists the behaviours that Lua has to reproduce. After a new ReBorn release the tool is run again and the
+hunks are diffed against the previous set to see which behaviours changed.
 
 Requires Python 3 with `capstone` and `pefile`.
