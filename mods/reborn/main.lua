@@ -75,6 +75,7 @@ gear.task(function()
     local game = A.wait_for_game(gear.config.timeout_game)
     check('game with a hero', game)
     gear.wait(3)
+    if gear.config.idle > 0 then gear.wait(gear.config.idle) end
 
     -- the ability values
     check('abilities applied', applied.ok and applied.count > 0, applied.count)
@@ -119,6 +120,28 @@ gear.task(function()
     check('the game read GAME01.PAK from the mod folder', save > 0, save)
     check('a save path resolves into the mod', gear.files.resolve('save/new.pak'):lower():gsub('\\', '/'):find('mods/reborn/save/new.pak', 1, true) ~= nil,
           gear.files.resolve('save/new.pak'))
+
+    -- pictures for a person to look at (the models and items come from the overlay's PAKs when it serves them)
+    A.screenshot('reborn-world')
+    A.press('i')
+    gear.wait(2)
+    A.screenshot('reborn-inventory')
+    A.press('i')
+    gear.wait(1)
+
+    -- which of the overlay's files the game really opened through it (informational; some are only read in some places)
+    local rules = gear.read('overlay.txt') or ''
+    local served_files, total = {}, 0
+    for line in rules:gmatch('([^' .. string.char(13, 10) .. ']+)') do
+        local game = line:match('^%s*([^#=]-)%s*=%s*%S')
+        if game and game:lower() ~= 'saves' then
+            local n = gear.files.served(game)
+            if n > 0 then served_files[game] = n; total = total + 1 end
+        end
+    end
+    results.overlay_served = served_files
+    print(('overlay: %d files served to the game'):format(total))
+    for game, n in pairs(served_files) do print(('  served %s x%d'):format(game, n)) end
 
     results.state = A.state()
     A.write('reborn.json', gear.json.encode(results))
