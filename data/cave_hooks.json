@@ -1,0 +1,346 @@
+[
+[
+"00424370",
+"004244A0",
+"00424250",
+"01AC8319",
+"rsrc",
+"cmp eax, 0x7fffffff"
+],
+[
+"004EC19D",
+"004EC35D",
+"004EC330",
+"01ADBF00",
+"rsrc",
+"jne 0x4ec378"
+],
+[
+"004EC1EC",
+"004EC3AC",
+"004EC330",
+"01ADBEC0",
+"rsrc",
+"call 0x819580"
+],
+[
+"00510978",
+"00510B38",
+"0050E6C0",
+"01AC79A0",
+"rsrc",
+"call 0x54cde0"
+],
+[
+"005116F9",
+"005118B9",
+"0050E6C0",
+"01AC79A0",
+"rsrc",
+"call 0x54cde0"
+],
+[
+"00511EFE",
+"005120BE",
+"0050E6C0",
+"01AC79A0",
+"rsrc",
+"call 0x54cde0"
+],
+[
+"0052EC9B",
+"0052EE2B",
+"0052E460",
+"01ADB810",
+"rsrc",
+"fild dword ptr [esp + 0x20] ; lea ecx, [ebp + 0x3a8]"
+],
+[
+"00580922",
+"00580A62",
+"005809B0",
+"01ADCEE8",
+"rsrc",
+"cmp ax, 0x426 ; jne 0x580968"
+],
+[
+"005BC466",
+"005BC4F6",
+"005BB010",
+"01ADCFB4",
+"rsrc",
+"mov dl, byte ptr [ebp + 0x249]"
+],
+[
+"005BC7C6",
+"005BC856",
+"005BB010",
+"01ADCFCC",
+"rsrc",
+"mov cl, byte ptr [ebp + 0x249]"
+],
+[
+"005BC9D6",
+"005BCA66",
+"005BB010",
+"01ADCFF0",
+"rsrc",
+"mov dl, byte ptr [ebp + 0x249]"
+],
+[
+"005BCAD9",
+"005BCB69",
+"005BB010",
+"01ADCFE4",
+"rsrc",
+"mov dl, byte ptr [ebp + 0x249]"
+],
+[
+"005BCBC0",
+"005BCC50",
+"005BB010",
+"01ADCFD8",
+"rsrc",
+"mov dl, byte ptr [ebp + 0x249]"
+],
+[
+"005BD3E2",
+"005BD472",
+"005BB010",
+"01ADCFC0",
+"rsrc",
+"mov cl, byte ptr [ebp + 0x249]"
+],
+[
+"005CAC6B",
+"005CACFB",
+"005CA9E0",
+"01ADBB00",
+"rsrc",
+"cmp edx, 0x1418"
+],
+[
+"0061879E",
+"006186FE",
+"00618090",
+"01ACC7D9",
+"rsrc",
+"cmp eax, 0x37 ; ja 0x6187e7"
+],
+[
+"00618883",
+"006187E3",
+"00618090",
+"01ADB400",
+"rsrc",
+"mov al, byte ptr [0x182cb6c]"
+],
+[
+"00618E72",
+"00618DD2",
+"00618090",
+"01ADB420",
+"rsrc",
+"cmp eax, 0x20 ; je 0x618ea1 ; cmp eax, 0x116 ; jne 0x618f77"
+],
+[
+"006AD51E",
+"006AD86E",
+"006AD540",
+"01ACE309",
+"rsrc",
+"mov eax, dword ptr [0x9eb5c8]"
+],
+[
+"006C66ED",
+"006C696D",
+"006C6490",
+"01ACDE4A",
+"rsrc",
+"call 0x6728c0"
+],
+[
+"006D18EA",
+"006D1B6A",
+"006D1460",
+"01ACE110",
+"rsrc",
+"push 0x80"
+],
+[
+"006D401B",
+"006D429B",
+"006D4250",
+"01ADBC00",
+"rsrc",
+"call 0x6d3ee0"
+],
+[
+"006D48D9",
+"006D4B59",
+"006D49A0",
+"01AC8087",
+"rsrc",
+"cmp dword ptr [eax], 0 ; je 0x6d48df ; inc ecx ; add eax, 0x114 ; dec edx ; jne 0x6d48d9 ; and ecx, 0xffff ; mov ecx, dword ptr [ecx*4 + 0xad2aac] ; test ecx, ecx ; mov dword ptr [esp + 0x28], ecx ; je 0x6d49ee"
+],
+[
+"006D5857",
+"006D5AD7",
+"006D5760",
+"0057FC40",
+"text/data",
+"neg eax ; push eax ; call 0x57fc40 ; mov ecx, ebp ; call 0x6d42a0 ; mov ecx, ebp ; call 0x6d3d50"
+],
+[
+"006DB3F3",
+"006DB673",
+"006DAD90",
+"01ADBC80",
+"rsrc",
+"push 1 ; push edx ; call 0x43b070"
+],
+[
+"006DC37C",
+"006DC5FC",
+"006DC010",
+"01ACE4D8",
+"rsrc",
+"push 0x470 ; call 0x8485e2"
+],
+[
+"006E1F47",
+"006E2197",
+"006E1BC0",
+"01ACC770",
+"rsrc",
+"jb 0x6e25c9"
+],
+[
+"006E1F97",
+"006E21E7",
+"006E1BC0",
+"01ACCFC0",
+"rsrc",
+"mov byte ptr [esp + 0x13], 1"
+],
+[
+"006E1FC9",
+"006E2219",
+"006E1BC0",
+"01ACCFC0",
+"rsrc",
+"mov byte ptr [esp + 0x13], 1"
+],
+[
+"006E1FF7",
+"006E2247",
+"006E1BC0",
+"01ACCFC0",
+"rsrc",
+"mov byte ptr [esp + 0x13], 1"
+],
+[
+"006E2025",
+"006E2275",
+"006E1BC0",
+"01ACCFC0",
+"rsrc",
+"mov byte ptr [esp + 0x13], 1"
+],
+[
+"006E204E",
+"006E229E",
+"006E1BC0",
+"01ACD050",
+"rsrc",
+"call 0x6e17d0"
+],
+[
+"006E356E",
+"006E37BE",
+"006E3430",
+"01ADB360",
+"rsrc",
+"and eax, 0xffff"
+],
+[
+"006F75A2",
+"006F78E2",
+"006F7730",
+"01ACDE15",
+"rsrc",
+"mov ecx, 0x17e82b8"
+],
+[
+"00752C14",
+"00753334",
+"007530C0",
+"01ACE2DD",
+"rsrc",
+"fstp dword ptr [esi + 0x8c]"
+],
+[
+"007563EC",
+"00756B0C",
+"00756A90",
+"01ACDE00",
+"rsrc",
+"call 0x722610"
+],
+[
+"00757626",
+"00757D46",
+"00757840",
+"01ACC950",
+"rsrc",
+"push 0x953fd0"
+],
+[
+"00757738",
+"00757E58",
+"00757840",
+"01ACC820",
+"rsrc",
+"cmp eax, 0x11 ; ja 0x7581f1"
+],
+[
+"00757F83",
+"007586A3",
+"00757840",
+"01ACC960",
+"rsrc",
+"add esp, 4 ; cmp eax, 0x4d"
+],
+[
+"00759ADF",
+"0075A1FF",
+"00759AF0",
+"01ACDE2A",
+"rsrc",
+"call 0x6a55f0"
+],
+[
+"00811431",
+"00811D81",
+"008118A0",
+"01ACCC80",
+"rsrc",
+"call 0x65df90"
+],
+[
+"00811757",
+"008120A7",
+"008118A0",
+"01ACC750",
+"rsrc",
+"mov word ptr [esp + 0x4a], bp"
+],
+[
+"00816E2D",
+"00817D8D",
+"00817B30",
+"01ACCA50",
+"rsrc",
+"push ebx ; push esi ; push ebp ; call 0x813140 ; add esp, 0xc ; test al, al ; jne 0x816e4f ; add esi, 0x10 ; inc edi ; cmp esi, 0x897444 ; jl 0x816e2d ; mov eax, dword ptr [0x17e5cb4] ; jmp 0x816e56 ; mov eax, edi ; mov dword ptr [0x17e5cb4], eax ; shl eax, 4 ; add eax, 0x897394"
+]
+]
