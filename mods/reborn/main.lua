@@ -129,6 +129,14 @@ gear.on('bonus.constant', function(index)
     return BONUS[index]
 end)
 
+-- SR_QUICK_CAST (B8): with the Settings.cfg key set to 1, choosing a skill slot with its digit key uses the skill at the cursor at once (ReBorn sends
+-- the UI a mouse event at the cursor after the selection).
+gear.on('skillslot.select', function()
+    if gear.settings.game('SR_QUICK_CAST') == '1' or gear.config.quick_cast then
+        gear.game.cursor_click()
+    end
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -271,6 +279,7 @@ gear.task(function()
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
+    check('skillslot.select stub: the displaced instruction still runs', st and st.slot_byte == 1, st and tostring(st.slot_byte))
     check('bonus.constant stubs without an answer: push 5 and push 3.5', st and st.bonus_int == 5 and math.abs(st.bonus_float - 3.5) < 1e-6,
           st and (st.bonus_int .. ' ' .. st.bonus_float))
     check('effect.add stub without an answer: the engine path (exit 1), entry 0 = 3.5, counter 4',
@@ -367,6 +376,15 @@ gear.task(function()
                 end
             end
             A.screenshot('reborn-casts')
+            -- quick cast: the digit keys choose a skill slot (the slot hook), the mod then clicks at the cursor
+            gear.config.quick_cast = true
+            for key = 1, 5 do
+                A.move(803 + 80 * key / 2, 465)
+                step('slot key ' .. key, function() A.type(tostring(key)) end)
+            end
+            gear.config.quick_cast = false
+            local ss = gear.hooks.stats('skillslot.select')
+            print(('skillslot.select hook: %d calls, %d answered, %d busy'):format(ss.calls, ss.answered, ss.busy))
             -- melee swings (Shift + click) until the hero is hurt or the time is up
             local t = 0
             while t < gear.config.fight and hero:hp() and hero:hp() > 100 do

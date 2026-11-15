@@ -153,8 +153,13 @@ them as follows:
 | `SR_RESISTANCE_GLOW` | writes 0 over the immediate of an `and ecx, 0x40007800` at DE `0x44BA58` (ENG function `0x44B230`) | clears the item-flag mask passed to an item draw, which changes the glow/colour flags of resistance items |
 | `SR_UPSCALING` | `push 0` -> `push 1` at DE `0x630503` and a 2-byte jump removed at DE `0x630A27`, both in ENG function `0x62FF60` | a render-state switch in the world render function (engine) |
 
-**Gear API:** `gear.settings.get(key)` (read `Settings.cfg` keys), and for quick cast a way to inject a click at the cursor
-(`gear.input.click(x, y)`; Gear's isolated input for automation is the building block). RESISTANCE_GLOW and UPSCALING are rendering: Bild.
+**Gear API (implemented):** `gear.settings.game(key)` reads `Settings.cfg`; the event `skillslot.select` (five site hooks in ENG `0x6E1BC0`, after a digit key chose
+a slot: four `mov byte [esp+0x13], 1` that follow the `call 0x6E1A20` selection and the last `call` itself) and `gear.game.cursor_click()`, which sends the
+engine's window event handler (ENG `0x6172C0`, found by a window 0x30 bytes inside because SacredBild detours its start) a mouse-up event
+(class vtable ENG `0x899248`, type 2, the cursor `0x182EE18/1C`) at the object ENG `0xAD6EF8`, as ReBorn's cave does. `mods/reborn` clicks when `SR_QUICK_CAST`
+is `1`. **Not verified in real play:** injected digit characters did not reach the five sites in the fight harness (the stubs are verified on
+functions built in memory), and whether Bild's coordinate remapping of the world mouse hook agrees with the cursor globals still has to be seen with a
+real key press. ReBorn's other change in that handler (a cave at `0x1ACC770` that routes the keys `1`..`7` to the slot actions) is not re-created. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
 
 ## B9 Hooks into appended code (43 hooks)
 
