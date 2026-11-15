@@ -54,6 +54,21 @@ end
 
 -- B12: ReBorn turns a level into a factor in integer tiers of 12 levels (1 up to level 12, 2 up to 24, 3 up to 36, 4 above);
 -- vanilla uses (34 L + 8) / (c1 L + c2). The engine asks through the level.factor hook (six places).
+-- B13: constants the engine loads inside its hit handlers and difficulty code. ReBorn points those instructions at other
+-- constants: the effect scale of the four hit handlers 0.2 -> 1.0; their chance scale 0.01 -> 1.0 in two of them and, in the other two, a
+-- float read from code bytes (-3.4022e35: an address typo of ReBorn's, reproduced); the five difficulty factors 1.0 1.34 1.67 2.0 2.34 ->
+-- 1.06 1.08 1.10 1.12 1.14; three scales of one function 0.01 -> 0.01, 0.05, 0.05.
+local REBORN_CONSTANTS = {
+    ['hit.effect_scale'] = {1.0, 1.0, 1.0, 1.0},
+    ['hit.chance_scale'] = {-3.4022038704631622e35, -3.4022038704631622e35, 1.0, 1.0},
+    ['difficulty.factor'] = {1.06, 1.08, 1.10, 1.12, 1.14},
+    ['scale.559BF0'] = {0.01, 0.05, 0.05},
+}
+gear.on('combat.constant', function(name, vanilla, index)
+    local list = REBORN_CONSTANTS[name]
+    return list and list[index + 1]
+end)
+
 local level_handler = gear.on('level.factor', function(level)
     local tier = 1
     if level > 12 then tier = 2 end
@@ -166,10 +181,54 @@ gear.task(function()
         check(('engine level function without a handler: level %d gives the vanilla %d'):format(case[1], case[2]), got == case[2], got)
     end
 
+    -- the stubs of the constant site hooks, on two functions built in memory: answered through a handler of this mod, then vanilla
+    local selftest_handler = gear.on('combat.constant', function(name, vanilla)
+        if name == 'selftest.fmul' then return vanilla * 10 end
+        if name == 'selftest.fld' then return 7.5 end
+    end)
+    local st
+    for attempt = 1, 20 do
+        if A.site_hook_selftest_start() then
+            gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
+            if st ~= nil then break end
+        end
+        gear.wait(0.1)
+    end
+    check('constant site stub: fmul answered by a mod (0.2 * 10)', st and math.abs(st.fmul - 2.0) < 1e-4, st and st.fmul)
+    check('constant site stub: fld answered by a mod (7.5)', st and math.abs(st.fld - 7.5) < 1e-4, st and st.fld)
+    check('constant site stub: eax, ecx and edx survive', st and st.registers_kept, st and tostring(st.registers_kept))
+    gear.off(selftest_handler)
+    st = nil
+    for attempt = 1, 20 do
+        if A.site_hook_selftest_start() then
+            gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
+            if st ~= nil then break end
+        end
+        gear.wait(0.1)
+    end
+    check('constant site stub without an answer: the vanilla constants', st and math.abs(st.fmul - 0.2) < 1e-4 and math.abs(st.fld - 0.2) < 1e-4,
+          st and (st.fmul .. ' ' .. st.fld))
+
+    -- a fight: creatures next to the hero make the engine's hit code run through the hooks (counters only; informational)
+    if gear.config.fight > 0 then
+        local hero = gear.world.hero()
+        local types = gear.data.object_types:search('wolf', 50)
+        local kind
+        for _, t in ipairs(types) do if t.kind and t.kind < 4 then kind = t.id; break end end
+        if hero and kind then
+            local x, y, layer = hero:position()
+            for i = 1, 4 do gear.world.spawn(kind, x + 60 * i, y + 40, {layer = layer}) end
+            gear.wait(gear.config.fight)
+        end
+    end
+
     -- the level.factor hook: the engine's sites were hooked (the counters show whether the game asked meanwhile)
     local hs = gear.hooks.stats('level.factor')
     print(('level.factor hook: %d calls, %d answered, %d busy'):format(hs.calls, hs.answered, hs.busy))
     results.level_factor = hs
+    local cs = gear.hooks.stats('combat.constant')
+    print(('combat.constant hook: %d calls, %d answered, %d busy'):format(cs.calls, cs.answered, cs.busy))
+    results.combat_constant = cs
     check('the level.factor hook answered the engine', hs.answered >= 7, ('%d calls, %d answered, %d busy'):format(hs.calls, hs.answered, hs.busy))
 
     -- which of the overlay's files the game really opened through it (informational; some are only read in some places)
