@@ -27,3 +27,10 @@ with SHA-256). The hunks are **not applied** to a game: ReBorn is re-created as 
 hunks are diffed against the previous set to see which behaviours changed.
 
 Requires Python 3 with `capstone` and `pefile`.
+
+## The mod
+
+`mods/reborn` is the generated Sacred Gear mod (see its README): `overlay.txt` (ReBorn's data files where the game opens the
+original ones; `data/` is made by `reborn_port.py --mod mods/reborn --data bin|all`, hard-linked from the ReBorn folder, not kept in git),
+`abilities_edits.json` (ReBorn's values of the exe's ability tables, `tools/abilities.py`) and `main.lua`. Self test on the English GOG exe:
+`Sacred.exe -gear-auto -gear-load=1 -gear-mods=reborn`.

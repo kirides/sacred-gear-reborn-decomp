@@ -33,14 +33,18 @@ records of 0x78 bytes, ids 1000, 1001, 1002, 1009, 1057 ...), `FUN_004d2310(id)`
 0x94 bytes, ids 1, 2, 3 ...). Code that has an id tries T1 first and falls back to T2 (`FUN_004fe870`, `FUN_006d60e0`), and
 both records have a `target_mode` byte that is passed on the same way, so they are one ability table split by id range.
 About 80 callers each (`FUN_005bb010` creature action handler, `FUN_00571710`, `FUN_005796a0`, the tooltip `FUN_006a6550`, ...).
-Whether T1 holds skills and T2 combat arts / spells is a guess; the Lua API therefore exposes one table.
+**What they are:** the names in the game's own texts (read through `gear.text.get` by `tools/abilitydump`, `data/ability_names.json`) say **T1 = the combat
+arts** (`1000` Rundumschlag / "sweep", `1001` Harter Schlag, `1002` Attacke, `1003` Stampfsprung, `1004` Explosionspfeil ...) and **T2 = the spells**
+(`1` Phasenverschiebung, `2` Steinhaut, `3` Gefaehrtin des Waldes, `4` Wasserform, `5` Feuerball ...). The Lua API still exposes one table by id
+(`gear.data.abilities[id]`, with `.kind` = `'combat_art'` or `'spell'`). The names are German because that was the game's language in the dump run.
 
 ### T1 record (0x78 bytes)
 
 | Offset | Type | Name | Evidence |
 |---|---|---|---|
 | +0x00 | i16 | `id` | lookup key |
-| +0x04 | u32 | `name_text` | text id (`FUN_004d2020` formats name + level) |
+| +0x04 | u32 | `name_text` | text id of the name: proven (`gear.text.get` gives the combat art's name for all 94) |
+| +0x08 | u32 | `description_text` | text id of the description: proven (the descriptions come back for all 94) |
 | +0x4C | u32 (read as byte) | `target_mode` | proven: passed as the mode of `FUN_0051d840`; same use as T2 +0x3C |
 | +0x50 | f32 | `effect_base` | proven: `level * effect_per_level + effect_base`, level 1..100 (`FUN_005bb010` case 0xBFC, `FUN_005796a0` case 0x3F7) |
 | +0x54 | f32 | `effect_per_level` | proven (same) |
@@ -54,6 +58,8 @@ Whether T1 holds skills and T2 combat arts / spells is a guess; the Lua API ther
 | Offset | Type | Name | Evidence |
 |---|---|---|---|
 | +0x00 | i16 | `id` | key |
+| +0x04 | u32 | `name_text` | proven: `gear.text.get` gives the spell's name for all 70 |
+| +0x08 | u32 | `description_text` | proven: the description text for 59 of 70 (the others have none) |
 | +0x3C | u8 | `target_mode` | proven (as above) |
 | +0x42 / +0x44 | i16 | `value0_base`, `value0_per_level` | proven: tooltip `FUN_006a6550` computes `level * per_level + base` |
 | +0x46 / +0x48 | i16 | `value1_base`, `value1_per_level` | proven |
@@ -163,7 +169,15 @@ and the other caves; they sit mostly in UI and startup functions (`dxDriver7_dra
 `0x759AF0`, window constructors `0x6C9F60`, `0x6CCBD0`, `0x6A4F30`, `0x6E7AF0`, `0x722500`): HD layout, engine. 17 are condition flips
 (`ja -> jbe` x4 in `FUN_005abd80` (B7), `jne -> je` x3, `je -> jmp` x5, ...); each needs its context read.
 
-## Gear APIs this needs (all to add, named, with hooks and signatures)
+## Gear APIs: done and still to do
+
+Done on sacred-bild branch `reborn-mod` (LuaLS annotations, `docs/GearApi.md`, kernel tests): `gear.text.get(id)`, `gear.settings.get(key)`,
+`gear.data.abilities[id]` with `:apply(edits)`, `:restore()`, `:ids()`, `:fields(id)` (validated writes to the live tables, undone on restore and when a mod is
+switched off), `gear.files.overlay()`, `.resolve(path)`, `.served(path)` and the declarative file overlay (`mods/<id>/overlay.txt`: file rules, `saves = <folder>`
+for a mod's own save folder; read when Sacred Gear starts because the game opens its data files before any Lua runs). `gear.text.load` is not needed: the
+overlay serves ReBorn's `SRglbl.res` as `scripts\<language>\global.res`, which SacredBild's language loader reads.
+
+Still to do, as listed below:
 
 | API | For |
 |---|---|

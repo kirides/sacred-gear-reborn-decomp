@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import capstone
 from exeimg import Image, FuncTable, masked, cs
 from analysis import write_analysis
+import datamap
 
 # ReBorn's globals for the screen size and everything derived from it (a block in the zero-filled part of .data)
 HD_GLOBALS = (0xA1EF00, 0xA1F200)
@@ -51,11 +52,14 @@ def main():
     ap.add_argument('--base', required=True, help="the German sacred.exe ReBorn was patched from")
     ap.add_argument('--target', required=True, help="the English Sacred.exe the mod runs on")
     ap.add_argument('--map', required=True, help="map_de_eng.json (tools/map_de_eng.py of sacred-bild)")
-    ap.add_argument('--vanilla', help="vanilla German install folder (default: the folder of --base)")
+    ap.add_argument('--vanilla', help="the vanilla install the data is compared with (default: the folder of --target, the English install the mod runs on)")
     ap.add_argument('--bild-sites', help="sacred-bild's src/game/resolution_sites.inc (marks patches on its sites)")
     ap.add_argument('--eng-names', help="sacred-bild's tools/data/functions_eng.tsv (function names)")
     ap.add_argument('--decomp', help="decomp-sacred folder (English decompile)")
     ap.add_argument('--out', default='out')
+    ap.add_argument('--mod', help="the mod folder to generate (overlay.txt, data/, abilities_edits.json), e.g. mods/reborn")
+    ap.add_argument('--data', default='bin', choices=['none', 'bin', 'all'], help="which data files the overlay serves: the SRB data and text (bin), or all (also the PAKs)")
+    ap.add_argument('--copy', action='store_true', help="copy the data files instead of hard-linking them")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
@@ -216,8 +220,9 @@ def main():
     caves = sorted(new_code_targets)
 
     # 4. data manifest
-    van = args.vanilla or os.path.dirname(os.path.abspath(args.base))
-    manifest = data_manifest(args.reborn, van)
+    van = args.vanilla or os.path.dirname(os.path.abspath(args.target))
+    renames = datamap.derive_renames(patches, de, rb)
+    manifest = datamap.build_manifest(args.reborn, van, renames)
 
     # 5. output
     def jp(p):
@@ -239,6 +244,9 @@ def main():
     for p in patches:
         by.setdefault(p['class'], {'auto': 0, 'review': 0})[p['status']] += 1
     write_analysis(args, patches, de, rb, eng, fmap, gmap, caves, manifest, by)
+    if args.mod:
+        n = datamap.write_overlay(args.mod, args.reborn, manifest, args.data, link=not args.copy)
+        print(json.dumps({'overlay_files': n, 'renames': manifest['renames']}))
     print(json.dumps({'patches': len(patches), 'by_class': by, 'caves': len(caves), 'data_files': len(manifest['files'])}))
 
 

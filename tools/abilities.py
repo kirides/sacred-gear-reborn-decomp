@@ -14,12 +14,12 @@ TABLES = {
 # field: (offset, format). Names are proven by a consumer (see behaviours.md); everything else is unk_<offset>.
 FIELDS = {
     'T1': {
-        'id': (0x00, '<h'), 'name_text': (0x04, '<I'), 'target_mode': (0x4C, '<I'),
+        'id': (0x00, '<h'), 'name_text': (0x04, '<I'), 'description_text': (0x08, '<I'), 'target_mode': (0x4C, '<I'),
         'effect_base': (0x50, '<f'), 'effect_per_level': (0x54, '<f'),
         'effect2_base': (0x58, '<f'), 'effect2_per_level': (0x5C, '<f'),
     },
     'T2': {
-        'id': (0x00, '<h'), 'target_mode': (0x3C, '<B'),
+        'id': (0x00, '<h'), 'name_text': (0x04, '<I'), 'description_text': (0x08, '<I'), 'target_mode': (0x3C, '<B'),
         'value0_base': (0x42, '<h'), 'value0_per_level': (0x44, '<h'),
         'value1_base': (0x46, '<h'), 'value1_per_level': (0x48, '<h'),
         'value2_base': (0x4A, '<h'), 'value2_per_level': (0x4C, '<h'),
@@ -37,8 +37,8 @@ def layout(table):
         covered.update(range(off, off + struct.calcsize(fmt)))
     fmt, size = UNK[table]
     out = list(named.items())
-    for off in range(0, TABLES[table]['stride'] - size + 1, size):
-        if not covered & set(range(off, off + size)) and off >= 8:
+    for off in range(size, TABLES[table]['stride'] - size + 1, size):
+        if not covered & set(range(off, off + size)):
             out.append((f'unk_{off:02x}', (off, fmt)))
     return out
 

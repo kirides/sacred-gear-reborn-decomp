@@ -1,0 +1,825 @@
+{
+"note": "German texts: the game language of the dump run (gear.text.get through abilitydump)",
+"names": {
+"1": {
+"table": "T2",
+"kind": "spell",
+"name": "Phasenverschiebung"
+},
+"2": {
+"table": "T2",
+"kind": "spell",
+"name": "Steinhaut"
+},
+"3": {
+"table": "T2",
+"kind": "spell",
+"name": "GefÃ¤hrtin des Waldes"
+},
+"4": {
+"table": "T2",
+"kind": "spell",
+"name": "Wasserform"
+},
+"5": {
+"table": "T2",
+"kind": "spell",
+"name": "Feuerball"
+},
+"6": {
+"table": "T2",
+"kind": "spell",
+"name": "Pentagramm"
+},
+"7": {
+"table": "T2",
+"kind": "spell",
+"name": "Spirituelle Heilkraft"
+},
+"8": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitz"
+},
+"9": {
+"table": "T2",
+"kind": "spell",
+"name": "GÃ¶ttliche Gabe"
+},
+"10": {
+"table": "T2",
+"kind": "spell",
+"name": "Morph"
+},
+"11": {
+"table": "T2",
+"kind": "spell",
+"name": "Feuerspirale"
+},
+"12": {
+"table": "T2",
+"kind": "spell",
+"name": "Groundpoison"
+},
+"13": {
+"table": "T2",
+"kind": "spell",
+"name": "Blitzschlag"
+},
+"14": {
+"table": "T2",
+"kind": "spell",
+"name": "Breeze"
+},
+"15": {
+"table": "T2",
+"kind": "spell",
+"name": "Himmelsleuchten"
+},
+"16": {
+"table": "T2",
+"kind": "spell",
+"name": "Bannkreis der Angst"
+},
+"17": {
+"table": "T2",
+"kind": "spell",
+"name": "Rotierende Lichtklingen"
+},
+"18": {
+"table": "T2",
+"kind": "spell",
+"name": "Irritation"
+},
+"19": {
+"table": "T2",
+"kind": "spell",
+"name": "Bekehrung"
+},
+"20": {
+"table": "T2",
+"kind": "spell",
+"name": "Licht"
+},
+"21": {
+"table": "T2",
+"kind": "spell",
+"name": "GlaubensstÃ¤rke"
+},
+"22": {
+"table": "T2",
+"kind": "spell",
+"name": "Lichtschild"
+},
+"23": {
+"table": "T2",
+"kind": "spell",
+"name": "Fegefeuer"
+},
+"24": {
+"table": "T2",
+"kind": "spell",
+"name": "Flammenhaut"
+},
+"25": {
+"table": "T2",
+"kind": "spell",
+"name": "Fleisch zu Stein"
+},
+"26": {
+"table": "T2",
+"kind": "spell",
+"name": "Meteoritenhagel"
+},
+"27": {
+"table": "T2",
+"kind": "spell",
+"name": "Katarakt der Wendigkeit"
+},
+"28": {
+"table": "T2",
+"kind": "spell",
+"name": "Wirbelwind"
+},
+"29": {
+"table": "T2",
+"kind": "spell",
+"name": "WindbÃ¶e"
+},
+"30": {
+"table": "T2",
+"kind": "spell",
+"name": "Schildwall"
+},
+"31": {
+"table": "T2",
+"kind": "spell",
+"name": "Aue des Geistes"
+},
+"32": {
+"table": "T2",
+"kind": "spell",
+"name": "Reiki"
+},
+"33": {
+"table": "T2",
+"kind": "spell",
+"name": "Kettenblitz"
+},
+"34": {
+"table": "T2",
+"kind": "spell",
+"name": "Eissplitter"
+},
+"35": {
+"table": "T2",
+"kind": "spell",
+"name": "Frostring"
+},
+"36": {
+"table": "T2",
+"kind": "spell",
+"name": "Verwandlung"
+},
+"37": {
+"table": "T2",
+"kind": "spell",
+"name": "Wieselflink"
+},
+"38": {
+"table": "T2",
+"kind": "spell",
+"name": "Dornenkugel"
+},
+"39": {
+"table": "T2",
+"kind": "spell",
+"name": "Giftranken"
+},
+"40": {
+"table": "T2",
+"kind": "spell",
+"name": "PflanzenkÃ¤fig"
+},
+"41": {
+"table": "T2",
+"kind": "spell",
+"name": "Ruf der Ahnen"
+},
+"42": {
+"table": "T2",
+"kind": "spell",
+"name": "Genesung"
+},
+"43": {
+"table": "T2",
+"kind": "spell",
+"name": "Kriegsschrei"
+},
+"44": {
+"table": "T2",
+"kind": "spell",
+"name": "Gier"
+},
+"45": {
+"table": "T2",
+"kind": "spell",
+"name": "Tellerminen"
+},
+"46": {
+"table": "T2",
+"kind": "spell",
+"name": "Eingraben"
+},
+"47": {
+"table": "T2",
+"kind": "spell",
+"name": "Zwergenstahl"
+},
+"48": {
+"table": "T2",
+"kind": "spell",
+"name": "Zwergenpanzer"
+},
+"49": {
+"table": "T2",
+"kind": "spell",
+"name": "HÃ¶llendiskus"
+},
+"50": {
+"table": "T2",
+"kind": "spell",
+"name": "Feuerwand"
+},
+"51": {
+"table": "T2",
+"kind": "spell",
+"name": "Giftwolke"
+},
+"52": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"53": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"55": {
+"table": "T2",
+"kind": "spell",
+"name": "Gier"
+},
+"56": {
+"table": "T2",
+"kind": "spell",
+"name": "Tellerminen"
+},
+"57": {
+"table": "T2",
+"kind": "spell",
+"name": "Eingraben"
+},
+"58": {
+"table": "T2",
+"kind": "spell",
+"name": "Zwergenpanzer"
+},
+"59": {
+"table": "T2",
+"kind": "spell",
+"name": "Zwergenstahl"
+},
+"60": {
+"table": "T2",
+"kind": "spell",
+"name": "HÃ¶llendiskus"
+},
+"61": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"62": {
+"table": "T2",
+"kind": "spell",
+"name": "Ruf des Todes"
+},
+"63": {
+"table": "T2",
+"kind": "spell",
+"name": "HÃ¶llenkraft"
+},
+"64": {
+"table": "T2",
+"kind": "spell",
+"name": "FlammenwÃ¤chter"
+},
+"65": {
+"table": "T2",
+"kind": "spell",
+"name": "Tentakel"
+},
+"66": {
+"table": "T2",
+"kind": "spell",
+"name": "Chor der HÃ¶lle"
+},
+"67": {
+"table": "T2",
+"kind": "spell",
+"name": "HÃ¶llenfurcht"
+},
+"69": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"70": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"71": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"72": {
+"table": "T2",
+"kind": "spell",
+"name": "Kugelblitze"
+},
+"1000": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1001": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1002": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1003": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Stampfsprung"
+},
+"1004": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Explosionspfeil"
+},
+"1005": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Mehrfachschuss"
+},
+"1006": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Spinnenpfeil"
+},
+"1007": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Keulenpfeil"
+},
+"1008": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Klingenpfeil"
+},
+"1009": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1010": {
+"table": "T1",
+"kind": "combat_art",
+"name": "RÃ¼ckenbrecher"
+},
+"1012": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Fausthieb der GÃ¶tter"
+},
+"1013": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Schleuderklingen"
+},
+"1014": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Ehrfurcht"
+},
+"1015": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Sturm und Drang"
+},
+"1016": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Blicke wie Klingen"
+},
+"1017": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampfsprung"
+},
+"1018": {
+"table": "T1",
+"kind": "combat_art",
+"name": "BeeEffGee"
+},
+"1019": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Energieblitze"
+},
+"1020": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Wirbelschlag"
+},
+"1021": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Flic-Flac"
+},
+"1022": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Vampirform"
+},
+"1023": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Ritterform"
+},
+"1024": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Beherrschung"
+},
+"1025": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Beherrschung (Vampirin)"
+},
+"1026": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Wolfsruf"
+},
+"1027": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Wolfsruf (Vampirin)"
+},
+"1028": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Zeitbeherrschung"
+},
+"1029": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Zeitbeherrschung (Vampirin)"
+},
+"1030": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Blutbiss"
+},
+"1031": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Meisterbiss"
+},
+"1032": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Klauensprung"
+},
+"1033": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Blutkuss"
+},
+"1034": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Erweckung"
+},
+"1035": {
+"table": "T1",
+"kind": "combat_art",
+"name": "FledermÃ¤use: Blutschwarm"
+},
+"1036": {
+"table": "T1",
+"kind": "combat_art",
+"name": "FledermÃ¤use: Verwirrung"
+},
+"1037": {
+"table": "T1",
+"kind": "combat_art",
+"name": "FledermÃ¤use: WÃ¤chter"
+},
+"1038": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1039": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1040": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1041": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1042": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kobra"
+},
+"1043": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Mungo"
+},
+"1044": {
+"table": "T1",
+"kind": "combat_art",
+"name": "SeelenrÃ¤uber"
+},
+"1045": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Pak-Dain (Projektilumleitung)"
+},
+"1046": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Pak-Nakor (Magieumleitung)"
+},
+"1047": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Testosteron"
+},
+"1048": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Adrenalin"
+},
+"1049": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Sprengsatz"
+},
+"1050": {
+"table": "T1",
+"kind": "combat_art",
+"name": "HÃ¶llenschlund"
+},
+"1051": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Verwirrung"
+},
+"1052": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Gifthauch"
+},
+"1053": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Schlachtennebel"
+},
+"1054": {
+"table": "T1",
+"kind": "combat_art",
+"name": "JÃ¤gersucher"
+},
+"1057": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1058": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1059": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1060": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1061": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1062": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1063": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Auge um Auge (Attacke)"
+},
+"1064": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1065": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag (JÃ¤hzorn)"
+},
+"1066": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag (Rache)"
+},
+"1067": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke (Rage)"
+},
+"1068": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1069": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1070": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1071": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1072": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1073": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag / Wirbelklauen"
+},
+"1074": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag / Todesklauen"
+},
+"1075": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke / ReiÃŸende Klauen"
+},
+"1076": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kampftritt"
+},
+"1078": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Rundumschlag"
+},
+"1079": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Harter Schlag"
+},
+"1080": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1082": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kriegsrausch"
+},
+"1083": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Abschlag"
+},
+"1084": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Wucht"
+},
+"1085": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Flammenwerfer"
+},
+"1086": {
+"table": "T1",
+"kind": "combat_art",
+"name": "MÃ¶rsergranate"
+},
+"1087": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kanonenschuss"
+},
+"1089": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kriegsschrei"
+},
+"1091": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Sturzflug"
+},
+"1092": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Attacke"
+},
+"1094": {
+"table": "T1",
+"kind": "combat_art",
+"name": "FlugdÃ¤mon (Sturzflug)"
+},
+"1097": {
+"table": "T1",
+"kind": "combat_art",
+"name": "KampfdÃ¤mon (Attacke)"
+},
+"1098": {
+"table": "T1",
+"kind": "combat_art",
+"name": "FeuerdÃ¤mon (Feuerwand)"
+},
+"1099": {
+"table": "T1",
+"kind": "combat_art",
+"name": "GiftdÃ¤mon (Giftwolke)"
+},
+"1100": {
+"table": "T1",
+"kind": "combat_art",
+"name": "EnergiedÃ¤mon (Energieblitze)"
+},
+"1101": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Giftwolke"
+},
+"1102": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Feuerwand"
+},
+"1103": {
+"table": "T1",
+"kind": "combat_art",
+"name": "Kugelblitze"
+}
+}
+}
