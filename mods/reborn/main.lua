@@ -52,6 +52,16 @@ local function apply_abilities()
     end
 end
 
+-- B12: ReBorn turns a level into a factor in integer tiers of 12 levels (1 up to level 12, 2 up to 24, 3 up to 36, 4 above);
+-- vanilla uses (34 L + 8) / (c1 L + c2). The engine asks through the level.factor hook (six places).
+local level_handler = gear.on('level.factor', function(level)
+    local tier = 1
+    if level > 12 then tier = 2 end
+    if level > 24 then tier = 3 end
+    if level > 36 then tier = 4 end
+    return tier
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -128,6 +138,39 @@ gear.task(function()
     A.screenshot('reborn-inventory')
     A.press('i')
     gear.wait(1)
+
+    -- the level.factor hook: call the engine's own level function (from a worker thread, so the hook can answer): ReBorn's tiers
+    for _, case in ipairs({{5, 1}, {12, 1}, {13, 2}, {24, 2}, {30, 3}, {37, 4}, {80, 4}}) do
+        local got
+        for attempt = 1, 20 do
+            if A.engine_level_factor_start(case[1]) then
+                gear.wait_until(function() got = A.engine_level_factor_result(); return got ~= nil end, 3)
+                if got ~= nil then break end
+            end
+            gear.wait(0.1)
+        end
+        check(('engine level function: level %d gives the tier %d'):format(case[1], case[2]), got == case[2], got)
+    end
+
+    -- without the handler the displaced vanilla block runs unchanged: trunc((34 L + 8) / (7 L + 36))
+    gear.off(level_handler)
+    for _, case in ipairs({{5, 2}, {20, 3}, {100, 4}}) do
+        local got
+        for attempt = 1, 20 do
+            if A.engine_level_factor_start(case[1]) then
+                gear.wait_until(function() got = A.engine_level_factor_result(); return got ~= nil end, 3)
+                if got ~= nil then break end
+            end
+            gear.wait(0.1)
+        end
+        check(('engine level function without a handler: level %d gives the vanilla %d'):format(case[1], case[2]), got == case[2], got)
+    end
+
+    -- the level.factor hook: the engine's sites were hooked (the counters show whether the game asked meanwhile)
+    local hs = gear.hooks.stats('level.factor')
+    print(('level.factor hook: %d calls, %d answered, %d busy'):format(hs.calls, hs.answered, hs.busy))
+    results.level_factor = hs
+    check('the level.factor hook answered the engine', hs.answered >= 7, ('%d calls, %d answered, %d busy'):format(hs.calls, hs.answered, hs.busy))
 
     -- which of the overlay's files the game really opened through it (informational; some are only read in some places)
     local rules = gear.read('overlay.txt') or ''
