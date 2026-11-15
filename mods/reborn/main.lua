@@ -140,9 +140,14 @@ end)
 -- combat.branch (B13): in the four hit handlers ReBorn flips five conditional jumps. After the creation of an effect object (types 0x34B, 0x360,
 -- 0x35C, 0x35E) the `je` that skips the secondary effect when the object could not be made becomes a `jmp`: the secondary effect is never added
 -- (together with the pooled 0.2 -> 1.0 of the chance rolls); in the combat art handler the test for the art 0x3FC (`jne`) is inverted.
-gear.on('combat.branch', function(name, vanilla)
+-- More flips outside the hit handlers: the creature AI's timer test (`cmp eax, 0xB7; jne` -> `je`: now the creature type 0xB7 takes the jump),
+-- the ability dispatch (`cmp eax, 0x28; jge` -> `je`: only the ability 0x28) and a clamp to 255 that is never applied (`jbe` -> `jmp`).
+gear.on('combat.branch', function(name, vanilla, index, eax)
     if name == 'hit.secondary' then return true end
     if name == 'hit.condition' then return not vanilla end
+    if name == 'ai.timer' then return eax == 0xB7 end
+    if name == 'ability.dispatch' then return eax == 0x28 end
+    if name == 'color.clamp' then return true end
 end)
 
 gear.on('load', apply_abilities)
@@ -287,6 +292,8 @@ gear.task(function()
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
+    check('combat.branch rel8 stub without an answer: taken, eax untouched by the displaced add (path 2, 0x28 stays 0)', st and st.branch2_path == 2 and st.branch2_eax == 0,
+          st and (st.branch2_path .. ' ' .. st.branch2_eax))
     check('combat.branch stub without an answer: the engine je is taken (2)', st and st.branch_taken == 2, st and tostring(st.branch_taken))
     check('skillslot.select stub: the displaced instruction still runs', st and st.slot_byte == 1, st and tostring(st.slot_byte))
     check('bonus.constant stubs without an answer: push 5 and push 3.5', st and st.bonus_int == 5 and math.abs(st.bonus_float - 3.5) < 1e-6,
@@ -298,6 +305,9 @@ gear.task(function()
     -- the same stubs answered by a handler (a fake creature of type 77)
     local effect_test = gear.on('effect.add', function(e)
         if e.creature == 5 and e.ability == 7 and e.effect == 10 then return {value = 9, effect = 11, finish = true, stack = 'inc'} end
+    end)
+    local branch_test = gear.on('combat.branch', function(name, vanilla, index, eax)
+        if name == 'selftest.branch2' then return eax ~= 0x28 end      -- eax must arrive as 0x28: the jump is refused
     end)
     local bonus_test = gear.on('bonus.constant', function(index, vanilla)
         if index == 10 then return vanilla * 2 end      -- the self test's push imm8 site
@@ -317,7 +327,7 @@ gear.task(function()
         if A.site_hook_selftest_start() then
             gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
             -- the worker thread cannot run Lua while the engine thread does (the stub then keeps the engine's value): try again
-            if st ~= nil and st.ability_store == 101 and st.damage == 65534 and st.effect_exit == 3 and st.bonus_int == 10 then break end
+            if st ~= nil and st.ability_store == 101 and st.damage == 65534 and st.effect_exit == 3 and st.bonus_int == 10 and st.branch2_path == 1 then break end
         end
         gear.wait(0.1)
     end
@@ -330,6 +340,9 @@ gear.task(function()
           st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
     check('bonus.constant stubs answered by a mod: 5 -> 10, 3.5 -> 4.75', st and st.bonus_int == 10 and math.abs(st.bonus_float - 4.75) < 1e-6,
           st and (st.bonus_int .. ' ' .. st.bonus_float))
+    check('combat.branch rel8 stub answered by a mod: falls through (path 1), the displaced add ran (eax 0x26)', st and st.branch2_path == 1 and st.branch2_eax == 0x26,
+          st and (st.branch2_path .. ' ' .. st.branch2_eax))
+    gear.off(branch_test)
     gear.off(bonus_test)
     gear.off(ability_test)
     gear.off(damage_test)

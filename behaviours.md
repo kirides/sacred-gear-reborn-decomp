@@ -217,6 +217,11 @@ Needs the constants exposed: **API** `gear.data.constants` (named float table of
 `0x50F27C` `je -> jmp`) are site hooks of the event `combat.branch(name, vanilla, index) -> boolean`. The four `je` follow the creation of an effect object
 (types `0x34B`, `0x360`, `0x35C`, `0x35E`) and skip the secondary effect added when the object exists: ReBorn always skips it; `0x505230` tests for
 the combat art `0x3FC` and is inverted. `mods/reborn` answers them; `hit.secondary[1]` ran twice in real play.
+Three more flips outside the hit handlers use the same event (they are `jcc rel8`, the next instruction is copied into the stub; the handler also gets `eax`):
+`ai.timer` (ENG `0x4D7068`, `cmp eax, 0xB7; jne -> je`: the AI timer default 300 / 700 swaps between creature type 0xB7 and all others),
+`ability.dispatch` (`0x51DA04`, `cmp eax, 0x28; jge -> je`: only the ability 0x28 takes the jump, 0x29 no longer) and `color.clamp` (`0x4DEF0B`,
+`cmp word [esp+0x30], 0xFF; jbe -> jmp`: the clamp to 255 is never applied). Not re-created: B7 (`0x5AF7D7..0x5AF827` `ja -> jbe`, tied to the widening that stays 16 bit)
+and the engine/graphics flips (`0x644164`, `0x645FBA`, `0x6AC343`, `0x6DFDAE`, `0x84C0E1`).
 
 ## Hook sites for B12 and B13 (`data/hook_sites_b12_b13.json`): code sites, not data
 
