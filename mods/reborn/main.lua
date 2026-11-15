@@ -113,6 +113,22 @@ local function effect_add(e)
 end
 local effect_handler = gear.on('effect.add', effect_add)
 
+-- bonus.constant (B14, FUN_00571710 = the item bonus roller): the arguments of its random rolls. Keyed by the site's index (vanilla in the
+-- comment): the upper limits of three integer rolls 5 / 15 / 15 / 5 become 20 / 20 / 120 / 20, a text id 0x482 becomes 0x496, and the
+-- float amplitudes 0.15 (x4) become 0.2, the fifth 1.2.
+local BONUS = {
+    [0] = 0x14,     -- 5
+    [1] = 0x14,     -- 15
+    [2] = 0x496,    -- text 0x482
+    [3] = 0x78,     -- 15
+    [4] = 0x14,     -- 5
+    [5] = 0.2, [6] = 0.2, [7] = 0.2, [8] = 0.2,     -- 0.15
+    [9] = 1.2,      -- 0.15
+}
+gear.on('bonus.constant', function(index)
+    return BONUS[index]
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -255,6 +271,8 @@ gear.task(function()
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
+    check('bonus.constant stubs without an answer: push 5 and push 3.5', st and st.bonus_int == 5 and math.abs(st.bonus_float - 3.5) < 1e-6,
+          st and (st.bonus_int .. ' ' .. st.bonus_float))
     check('effect.add stub without an answer: the engine path (exit 1), entry 0 = 3.5, counter 4',
           st and st.effect_exit == 1 and st.effect_entry0 == 350 and st.effect_entry1 == 100 and st.effect_counter == 4,
           st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
@@ -262,6 +280,10 @@ gear.task(function()
     -- the same stubs answered by a handler (a fake creature of type 77)
     local effect_test = gear.on('effect.add', function(e)
         if e.creature == 5 and e.ability == 7 and e.effect == 10 then return {value = 9, effect = 11, finish = true, stack = 'inc'} end
+    end)
+    local bonus_test = gear.on('bonus.constant', function(index, vanilla)
+        if index == 10 then return vanilla * 2 end      -- the self test's push imm8 site
+        if index == 11 then return vanilla + 1.25 end   -- its float site
     end)
     local damage_test = gear.on('damage', function(hit)
         if hit.attacker_type == 77 then return hit.damage + 5 end
@@ -277,7 +299,7 @@ gear.task(function()
         if A.site_hook_selftest_start() then
             gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
             -- the worker thread cannot run Lua while the engine thread does (the stub then keeps the engine's value): try again
-            if st ~= nil and st.ability_store == 101 and st.damage == 17 and st.effect_exit == 3 then break end
+            if st ~= nil and st.ability_store == 101 and st.damage == 17 and st.effect_exit == 3 and st.bonus_int == 10 then break end
         end
         gear.wait(0.1)
     end
@@ -288,6 +310,9 @@ gear.task(function()
     check('effect.add stub answered by a mod: leave (exit 3), entry 1 = 9, entry 0 untouched, counter 5',
           st and st.effect_exit == 3 and st.effect_entry1 == 900 and st.effect_entry0 == 100 and st.effect_counter == 5,
           st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
+    check('bonus.constant stubs answered by a mod: 5 -> 10, 3.5 -> 4.75', st and st.bonus_int == 10 and math.abs(st.bonus_float - 4.75) < 1e-6,
+          st and (st.bonus_int .. ' ' .. st.bonus_float))
+    gear.off(bonus_test)
     gear.off(ability_test)
     gear.off(damage_test)
     gear.off(effect_test)

@@ -241,6 +241,28 @@ Immediate values pushed as arguments for individual spells change: `5 -> 0x14` (
 (`push 0x44F; call 0x4D1930 ...` -> `push 0x35D; ... call 0x672F70`: a different text is shown). These are spell-specific numbers that are
 not in the T2 table. Needs a hook around the spell effect (named per spell) or the constants as data.
 
+**Resolved (read in the English exe, `FUN_00571710` is ENG; DE `0x5715D0`):** it is not a spell effect function but the **item bonus roller**:
+the `cmp bx, 2/3/4` blocks (tiers) roll `rand(n)` and random float amplitudes into the item's bonus fields (`[ebp + 0xB6..0xC2, 0xEE]`) and
+append text lines. The nine numeric hunks are arguments of those rolls (ENG `0x578BF0` 5 -> 20, `0x578C7A` 15 -> 20, `0x578C87` text 0x482 -> 0x496,
+`0x578CC4` 15 -> 120, `0x578D07` 5 -> 20, `0x578D31/41/57/6D` 0.15 -> 0.2, `0x578D96` 0.15 -> 1.2). **Gear API:** `gear.on('bonus.constant', function(index,
+vanilla, address) -> number)` (ten site hooks; a `push imm8` is displaced together with the `call rand` after it); `mods/reborn` returns ReBorn's numbers.
+The other two hunks (`0x5789C4`, `0x578673`: a different tooltip text/format and the dropped `rand(15)` display) rewrite display code and are
+not hooked: the text part is served by the text overlay (`text_checks.json`).
+
+## B9 Effect-entry hook (`effect.add`) - decoded and re-created
+
+`FUN_00562330` (DE; ENG `0x562470`) loops over a creature's effect entries (stride `0x16`: id word `+4`, maximum float `+0xA`, value `+0x12`) and adds a
+value to the matching ones. ReBorn replaces the six bytes `fstp [ecx+0x12]; fld [ecx+0x12]` (ENG `0x56256D`) by a jump into a cave which, for the
+local hero (`[list-0x39C]` == the hero's id) and an ability other than `0x35`, adds to the entry of the ability in use instead of the loop's
+entry, skips the clamps and leaves the function; for ability `0x35` it stores nothing; and for every creature sets (flag `0x4000000`) or grows
+(`0x20000000`) a counter at `[list-0x214]`. (Its hero path leaves one value on the x87 stack; the Lua version does not.) The AI calls the
+function through a vanilla copy; here the stub ignores calls from the AI (return addresses `0x4DA04B..0x4DA23C`). **Gear API:**
+`gear.on('effect.add', function(e) -> {value, effect, clamp, finish, stack})`; `mods/reborn` implements the cave.
+
+## B11b `damage` hook
+
+See B11: `gear.on('damage', function(hit) -> damage)`, ENG `0x56DAAB`.
+
 ## B15 Small constant and condition changes - decoded (each a few bytes)
 
 | Site (ENG) | Vanilla | ReBorn | Note |
