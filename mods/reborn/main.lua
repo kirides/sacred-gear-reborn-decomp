@@ -214,17 +214,74 @@ gear.task(function()
     check('constant site stub without an answer: the vanilla constants', st and math.abs(st.fmul - 0.2) < 1e-4 and math.abs(st.fld - 0.2) < 1e-4,
           st and (st.fmul .. ' ' .. st.fld))
 
-    -- a fight: creatures next to the hero make the engine's hit code run through the hooks (counters only; informational)
+    -- real play: does the hero's own code reach the engine's hook sites? (informational; counters per site are logged)
     if gear.config.fight > 0 then
-        local hero = gear.world.hero()
-        local types = gear.data.object_types:search('wolf', 50)
-        local kind
-        for _, t in ipairs(types) do if t.kind and t.kind < 4 then kind = t.id; break end end
-        if hero and kind then
-            local x, y, layer = hero:position()
-            for i = 1, 4 do gear.world.spawn(kind, x + 60 * i, y + 40, {layer = layer}) end
-            gear.wait(gear.config.fight)
+        local function sitecalls()
+            local calls = 0
+            for _, site in ipairs(gear.hooks.sites()) do calls = calls + site.calls end
+            return calls
         end
+        local function step(name, fn)
+            local before = sitecalls()
+            fn()
+            gear.wait(1.0)
+            print(('step %s: %d new site calls'):format(name, sitecalls() - before))
+        end
+        -- UI paths: the combat arts tab and the skills list (tooltips)
+        step('open inventory', function() A.press('i') end)
+        step('combat arts tab', function() A.click(275, 423) end)
+        for k, pos in ipairs({{120, 480}, {200, 480}, {280, 480}, {360, 480}, {440, 480}}) do
+            step('hover art slot ' .. k, function() A.move(pos[1], pos[2]) end)
+        end
+        A.screenshot('reborn-arts')
+        step('close inventory', function() A.press('i') end)
+        step('character window', function() A.press('c') end)
+        for k, pos in ipairs({{1180, 90}, {1180, 112}, {1180, 135}}) do
+            step('hover skill ' .. k, function() A.move(pos[1], pos[2]) end)
+        end
+        step('close character', function() A.press('c') end)
+
+        -- the belt's orbs: tooltips of the weapon slots and of the right hand arts
+        for k, pos in ipairs({{987, 843}, {1063, 843}, {1143, 843}, {470, 843}, {560, 843}, {640, 843}}) do
+            step('hover belt orb ' .. k, function() A.move(pos[1], pos[2]) end)
+        end
+        A.screenshot('reborn-belt-tooltip')
+        A.move(800, 300)
+
+        local hero = gear.world.hero()
+        if hero then
+            local x, y, layer = hero:position()
+            for i = 1, 3 do gear.world.spawn(32, x + 90 * i, y + 60, {layer = layer}) end
+            gear.wait(3)
+            -- the belt's right hand art (the green sword) is used with the right mouse button: right clicks around the hero
+            for round = 1, 3 do
+                for k = 0, 7 do
+                    local th = k * math.pi / 4
+                    step(('right click %d.%d (combat art)'):format(round, k), function()
+                        A.click(803 + 80 * math.cos(th), 465 + 48 * math.sin(th), 'rbutton')
+                    end)
+                end
+            end
+            A.screenshot('reborn-casts')
+            -- melee swings (Shift + click) until the hero is hurt or the time is up
+            local t = 0
+            while t < gear.config.fight and hero:hp() and hero:hp() > 100 do
+                A.key_down('shift')
+                for k = 0, 7 do
+                    local th = k * math.pi / 4
+                    A.click(803 + 70 * math.cos(th), 465 + 42 * math.sin(th))
+                    gear.wait(0.5)
+                end
+                A.key_up('shift')
+                t = t + 4
+            end
+            print(('fight over: hero hp %s'):format(tostring(hero:hp())))
+        end
+        local total = 0
+        for _, site in ipairs(gear.hooks.sites()) do
+            if site.calls > 0 then print(('  site %s[%d] at %08x ran %d times'):format(site.hook, site.index, site.address, site.calls)); total = total + site.calls end
+        end
+        print(('site hook calls in play: %d'):format(total))
     end
 
     -- the level.factor hook: the engine's sites were hooked (the counters show whether the game asked meanwhile)

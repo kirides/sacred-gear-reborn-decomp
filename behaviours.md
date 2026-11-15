@@ -211,6 +211,19 @@ would change every user, not the four hit handlers. The 23 sites are instruction
   `0x570956`). ReBorn's replacements are 1.0 (`0x400B25`), 0.01 / 0.05 (`0x400FC4` / `0x400FC8`), the five factors 1.06..1.14 (`0x400FAF..BF`), and
   `[0x400625]` / a jump to appended code (`0x400AA0`), which are not plain constants (a variable or code).
 
+## Hook sites in real play (self test with `-Fight`, `tools/fightcal`)
+
+The hero was made to play with automation input (spawned skeleton and orc warriors, Shift + click melee swings, tooltips in the inventory and character
+windows, belt tooltips, right clicks with the belt's right hand combat art) and every site's run count was read through `gear.hooks.sites()`:
+- **Reached by the hero's combat art (right mouse button):** `hit.effect_scale[1]` (`FUN_00506770`, 5 runs), `hit.chance_scale[1]` (the same function, 79 runs: a
+  chance roll each frame the art runs), `scale.559BF0[0]` and `[1]` (1 run each). No crash dump, no visible change in the game.
+- **Not reached by anything tried** (melee swings, getting hit, inventory / character / belt tooltips, hotkeys): the six `level.factor` sites except the function
+  itself (which the self test calls directly), the other three `hit.effect_scale` and three `hit.chance_scale` sites (the other three hit handlers belong to
+  other combat art states: `FUN_00537160`'s dispatcher calls them by the creature's state `[creature+0x150]`), `scale.559BF0[2]`, the five
+  `difficulty.factor` sites (`FUN_0056B130`, callers `0x4CD3CB`, `0x4CD489`, `0x532047`) and `difficulty.scale`. The inlined level sites are in
+  `FUN_0050E6C0` (a hit handler) and `FUN_005893B0` (called from UI code `0x6C2AE3` and `0x6E4BC1`).
+- The monsters do not attack a hero that stands still after `gear.world.spawn` (they are created like script NPCs); a click on them wakes them up.
+
 ## B14 Spell parameters inside the effect function `FUN_00571710` (12 hunks) - characterised
 
 Immediate values pushed as arguments for individual spells change: `5 -> 0x14` (x2), `0xF -> 0x14` and `0xF -> 0x78`, `0x482 -> 0x496`
