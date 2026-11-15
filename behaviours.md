@@ -213,6 +213,11 @@ handlers, together with a branch each: `jne -> je` / `je -> jmp` that skips a co
 table as `1.06, 1.08, 1.10, 1.12, 1.14` (`0x400FAF..0x400FBF`): the per-difficulty or per-tier damage factors become much flatter.
 Needs the constants exposed: **API** `gear.data.constants` (named float table of the exe's combat constants) or the damage hook.
 
+**Branch flips (re-created):** the five conditional jumps ReBorn flips in the hit handlers (ENG `0x505230` `jne -> je`; `0x505395`, `0x5074E7`, `0x50BA2A`,
+`0x50F27C` `je -> jmp`) are site hooks of the event `combat.branch(name, vanilla, index) -> boolean`. The four `je` follow the creation of an effect object
+(types `0x34B`, `0x360`, `0x35C`, `0x35E`) and skip the secondary effect added when the object exists: ReBorn always skips it; `0x505230` tests for
+the combat art `0x3FC` and is inverted. `mods/reborn` answers them; `hit.secondary[1]` ran twice in real play.
+
 ## Hook sites for B12 and B13 (`data/hook_sites_b12_b13.json`): code sites, not data
 
 ReBorn does not change the constants' data: it points individual instructions at other constants. The pooled floats are shared by many users

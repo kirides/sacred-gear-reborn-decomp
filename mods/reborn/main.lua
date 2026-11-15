@@ -137,6 +137,14 @@ gear.on('skillslot.select', function()
     end
 end)
 
+-- combat.branch (B13): in the four hit handlers ReBorn flips five conditional jumps. After the creation of an effect object (types 0x34B, 0x360,
+-- 0x35C, 0x35E) the `je` that skips the secondary effect when the object could not be made becomes a `jmp`: the secondary effect is never added
+-- (together with the pooled 0.2 -> 1.0 of the chance rolls); in the combat art handler the test for the art 0x3FC (`jne`) is inverted.
+gear.on('combat.branch', function(name, vanilla)
+    if name == 'hit.secondary' then return true end
+    if name == 'hit.condition' then return not vanilla end
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -279,6 +287,7 @@ gear.task(function()
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
+    check('combat.branch stub without an answer: the engine je is taken (2)', st and st.branch_taken == 2, st and tostring(st.branch_taken))
     check('skillslot.select stub: the displaced instruction still runs', st and st.slot_byte == 1, st and tostring(st.slot_byte))
     check('bonus.constant stubs without an answer: push 5 and push 3.5', st and st.bonus_int == 5 and math.abs(st.bonus_float - 3.5) < 1e-6,
           st and (st.bonus_int .. ' ' .. st.bonus_float))
