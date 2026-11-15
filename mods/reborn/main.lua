@@ -82,6 +82,20 @@ local level_handler = gear.on('level.factor', function(level)
     return tier
 end)
 
+-- creature.ability (B6): the abilities the creature AI (ENG 004D4E50) picks. Keyed by the site's address; ReBorn changed these
+-- immediates (vanilla in the comment), the others keep the engine's id.
+local AI_ABILITY = {
+    [0x4D534A] = 23,    -- 25
+    [0x4D5754] = 33,    -- 29
+    [0x4D60ED] = 5,     -- 40
+    [0x4DA600] = 34,    -- 40
+    [0x4D80DD] = 0x419, -- the base the id 0x42b adds to
+    [0x4D5E68] = 0x31,  -- 0x32 - (x % 3 ~= 0): ReBorn always uses 0x31
+}
+gear.on('creature.ability', function(_, _, _, address)
+    return AI_ABILITY[address]
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -106,6 +120,11 @@ gear.task(function()
     check('game with a hero', game)
     gear.wait(3)
     if gear.config.idle > 0 then gear.wait(gear.config.idle) end
+
+    do
+        local h = gear.world.hero()
+        if h then print(('hero: %s level %s hp %s'):format(tostring(h:class()), tostring(h:level()), tostring(h:max_hp()))) end
+    end
 
     -- the ability values
     check('abilities applied', applied.ok and applied.count > 0, applied.count)
@@ -146,8 +165,9 @@ gear.task(function()
     -- the save folder redirect (overlay.txt: saves = save): the game read the savegame it loaded from the mod's folder
     local mine = info and info.saves
     check('saves are redirected to the mod', mine ~= nil, mine)
-    local save = gear.files.served('save/game01.pak')
-    check('the game read GAME01.PAK from the mod folder', save > 0, save)
+    local save = 0
+    for slot = 0, 5 do save = save + gear.files.served(('save/game%02d.pak'):format(slot)) end
+    check('the game read its savegame from the mod folder', save > 0, save)
     check('a save path resolves into the mod', gear.files.resolve('save/new.pak'):lower():gsub('\\', '/'):find('mods/reborn/save/new.pak', 1, true) ~= nil,
           gear.files.resolve('save/new.pak'))
 
@@ -213,6 +233,29 @@ gear.task(function()
     end
     check('constant site stub without an answer: the vanilla constants', st and math.abs(st.fmul - 0.2) < 1e-4 and math.abs(st.fld - 0.2) < 1e-4,
           st and (st.fmul .. ' ' .. st.fld))
+    check('creature.ability stubs without an answer: vanilla store 100, add 1000, block 49 (0x31)',
+          st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
+    check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
+
+    -- the same stubs answered by a handler (a fake creature of type 77)
+    local ability_test = gear.on('creature.ability', function(type_id, vanilla, index)
+        if type_id ~= 77 then return nil end
+        if vanilla == 100 then return 101 end
+        if vanilla == 1000 then return 2000 end
+        if vanilla == -1 then return 7 end
+    end)
+    st = nil
+    for attempt = 1, 20 do
+        if A.site_hook_selftest_start() then
+            gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
+            if st ~= nil then break end
+        end
+        gear.wait(0.1)
+    end
+    check('creature.ability stubs answered by a mod: store 101, add 2000, block 7',
+          st and st.ability_store == 101 and st.ability_add == 2000 and st.ability_edx == 7, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
+    check('creature.ability stubs answered: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
+    gear.off(ability_test)
 
     -- real play: does the hero's own code reach the engine's hook sites? (informational; counters per site are logged)
     if gear.config.fight > 0 then
