@@ -295,7 +295,7 @@ gear.task(function()
         if index == 11 then return vanilla + 1.25 end   -- its float site
     end)
     local damage_test = gear.on('damage', function(hit)
-        if hit.attacker_type == 77 then return hit.damage + 5 end
+        if hit.attacker_type == 77 then return hit.damage + 70000 end   -- over 16 bit: must saturate, not wrap
     end)
     local ability_test = gear.on('creature.ability', function(type_id, vanilla, index)
         if type_id ~= 77 then return nil end
@@ -308,14 +308,14 @@ gear.task(function()
         if A.site_hook_selftest_start() then
             gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
             -- the worker thread cannot run Lua while the engine thread does (the stub then keeps the engine's value): try again
-            if st ~= nil and st.ability_store == 101 and st.damage == 17 and st.effect_exit == 3 and st.bonus_int == 10 then break end
+            if st ~= nil and st.ability_store == 101 and st.damage == 65534 and st.effect_exit == 3 and st.bonus_int == 10 then break end
         end
         gear.wait(0.1)
     end
     check('creature.ability stubs answered by a mod: store 101, add 2000, block 7',
           st and st.ability_store == 101 and st.ability_add == 2000 and st.ability_edx == 7, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs answered: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
-    check('damage stub answered by a mod (attacker type 77): 12 + 5', st and st.damage == 17, st and tostring(st.damage))
+    check('damage stub answered above 16 bit saturates at 65534 (no wrap around)', st and st.damage == 65534, st and tostring(st.damage))
     check('effect.add stub answered by a mod: leave (exit 3), entry 1 = 9, entry 0 untouched, counter 5',
           st and st.effect_exit == 3 and st.effect_entry1 == 900 and st.effect_entry0 == 100 and st.effect_counter == 5,
           st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
