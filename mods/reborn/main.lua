@@ -96,6 +96,23 @@ gear.on('creature.ability', function(_, _, _, address)
     return AI_ABILITY[address]
 end)
 
+-- effect.add (B9): ReBorn replaces the store into a creature's effect entry (ENG 0056256D). For the player's own hero, an ability other than
+-- 0x35 adds to the entry of the ability in use (not the one the loop is at), leaves the clamps out and ends the loop; ability 0x35 stores
+-- nothing; every creature's effect counter is set (flag 0x4000000) or grown (flag 0x20000000). The AI's own calls keep the engine's behaviour.
+local function stack_mode(flags)
+    if bit.band(flags, 0x4000000) ~= 0 then return 'set' end
+    if bit.band(flags, 0x20000000) ~= 0 then return 'inc' end
+end
+local function effect_add(e)
+    local hero = gear.world.hero()
+    if hero and hero.id == e.creature then
+        if e.ability == 0x35 then return {clamp = true} end
+        return {value = e.value, effect = e.ability, clamp = false, finish = true, stack = stack_mode(e.flags)}
+    end
+    return {clamp = true, stack = stack_mode(e.flags)}
+end
+local effect_handler = gear.on('effect.add', effect_add)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -206,6 +223,7 @@ gear.task(function()
         check(('engine level function without a handler: level %d gives the vanilla %d'):format(case[1], case[2]), got == case[2], got)
     end
 
+    gear.off(effect_handler)     -- the stub tests below need to see the engine's behaviour without it
     -- the stubs of the constant site hooks, on two functions built in memory: answered through a handler of this mod, then vanilla
     local selftest_handler = gear.on('combat.constant', function(name, vanilla)
         if name == 'selftest.fmul' then return vanilla * 10 end
@@ -237,8 +255,14 @@ gear.task(function()
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
+    check('effect.add stub without an answer: the engine path (exit 1), entry 0 = 3.5, counter 4',
+          st and st.effect_exit == 1 and st.effect_entry0 == 350 and st.effect_entry1 == 100 and st.effect_counter == 4,
+          st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
 
     -- the same stubs answered by a handler (a fake creature of type 77)
+    local effect_test = gear.on('effect.add', function(e)
+        if e.creature == 5 and e.ability == 7 and e.effect == 10 then return {value = 9, effect = 11, finish = true, stack = 'inc'} end
+    end)
     local damage_test = gear.on('damage', function(hit)
         if hit.attacker_type == 77 then return hit.damage + 5 end
     end)
@@ -252,7 +276,8 @@ gear.task(function()
     for attempt = 1, 20 do
         if A.site_hook_selftest_start() then
             gear.wait_until(function() st = A.site_hook_selftest_result(); return st ~= nil end, 3)
-            if st ~= nil then break end
+            -- the worker thread cannot run Lua while the engine thread does (the stub then keeps the engine's value): try again
+            if st ~= nil and st.ability_store == 101 and st.damage == 17 and st.effect_exit == 3 then break end
         end
         gear.wait(0.1)
     end
@@ -260,8 +285,13 @@ gear.task(function()
           st and st.ability_store == 101 and st.ability_add == 2000 and st.ability_edx == 7, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs answered: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
     check('damage stub answered by a mod (attacker type 77): 12 + 5', st and st.damage == 17, st and tostring(st.damage))
+    check('effect.add stub answered by a mod: leave (exit 3), entry 1 = 9, entry 0 untouched, counter 5',
+          st and st.effect_exit == 3 and st.effect_entry1 == 900 and st.effect_entry0 == 100 and st.effect_counter == 5,
+          st and (st.effect_exit .. ' ' .. st.effect_entry0 .. ' ' .. st.effect_entry1 .. ' ' .. st.effect_counter))
     gear.off(ability_test)
     gear.off(damage_test)
+    gear.off(effect_test)
+    effect_handler = gear.on('effect.add', effect_add)
 
     -- real play: does the hero's own code reach the engine's hook sites? (informational; counters per site are logged)
     if gear.config.fight > 0 then
