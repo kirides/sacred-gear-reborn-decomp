@@ -1,0 +1,35 @@
+{
+ "language": "DE",
+ "checks": [
+  {
+   "id": 146,
+   "text": "Eiselfen-Hauptmann",
+   "was": null
+  },
+  {
+   "id": 164,
+   "text": "Fisch\t",
+   "was": null
+  },
+  {
+   "id": 165,
+   "text": "Fisch\t",
+   "was": null
+  },
+  {
+   "id": 204,
+   "text": "Höllengolem Krieger",
+   "was": "Höllengolem"
+  },
+  {
+   "id": 350,
+   "text": "Höllengolem",
+   "was": "Höllengolem Krieger"
+  },
+  {
+   "id": 798,
+   "text": "Zorn des Erzengels",
+   "was": "Blitzschlag"
+  }
+ ]
+}

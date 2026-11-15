@@ -100,6 +100,26 @@ gear.task(function()
     local served = gear.files.served('bin/balance.bin')
     check('the game read balance.bin from the mod', served > 0, served)
 
+    -- the text overlay: ids whose text ReBorn's SRglbl.res adds or changes (text_checks.json, made by tools/text_checks.py
+    -- from two runs of tools/textdump; the text depends on the language, so only for the language it was made in)
+    local tc = gear.read('text_checks.json')
+    tc = tc and gear.json.decode(tc)
+    if tc and tc.language == gear.settings.get('LANGUAGE') then
+        for _, c in ipairs(tc.checks) do
+            check(('text %d is from ReBorn'):format(c.id), gear.text.get(c.id) == c.text, gear.text.get(c.id))
+        end
+    else
+        print('text checks skipped: no text_checks.json for the game language')
+    end
+
+    -- the save folder redirect (overlay.txt: saves = save): the game read the savegame it loaded from the mod's folder
+    local mine = info and info.saves
+    check('saves are redirected to the mod', mine ~= nil, mine)
+    local save = gear.files.served('save/game01.pak')
+    check('the game read GAME01.PAK from the mod folder', save > 0, save)
+    check('a save path resolves into the mod', gear.files.resolve('save/new.pak'):lower():gsub('\\', '/'):find('mods/reborn/save/new.pak', 1, true) ~= nil,
+          gear.files.resolve('save/new.pak'))
+
     results.state = A.state()
     A.write('reborn.json', gear.json.encode(results))
     print(('%d passed, %d failed'):format(results.passed, results.failed))

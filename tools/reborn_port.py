@@ -59,6 +59,7 @@ def main():
     ap.add_argument('--out', default='out')
     ap.add_argument('--mod', help="the mod folder to generate (overlay.txt, data/, abilities_edits.json), e.g. mods/reborn")
     ap.add_argument('--data', default='bin', choices=['none', 'bin', 'all'], help="which data files the overlay serves: the SRB data and text (bin), or all (also the PAKs)")
+    ap.add_argument('--rules-only', action='store_true', help="write overlay.txt without the data files")
     ap.add_argument('--copy', action='store_true', help="copy the data files instead of hard-linking them")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
@@ -245,7 +246,7 @@ def main():
         by.setdefault(p['class'], {'auto': 0, 'review': 0})[p['status']] += 1
     write_analysis(args, patches, de, rb, eng, fmap, gmap, caves, manifest, by)
     if args.mod:
-        n = datamap.write_overlay(args.mod, args.reborn, manifest, args.data, link=not args.copy)
+        n = datamap.write_overlay(args.mod, args.reborn, manifest, args.data, link=not args.copy, rules_only=args.rules_only)
         print(json.dumps({'overlay_files': n, 'renames': manifest['renames']}))
     print(json.dumps({'patches': len(patches), 'by_class': by, 'caves': len(caves), 'data_files': len(manifest['files'])}))
 
