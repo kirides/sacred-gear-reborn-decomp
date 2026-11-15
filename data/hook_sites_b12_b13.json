@@ -1,0 +1,280 @@
+[
+{
+"eng": "00505439",
+"function": "005038F0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88eda0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "00505624",
+"function": "005038F0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400625]"
+]
+},
+{
+"eng": "0050758F",
+"function": "00506770",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88eda0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "00507793",
+"function": "00506770",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400625]"
+]
+},
+{
+"eng": "0050BACC",
+"function": "0050AC00",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88eda0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "0050BCB4",
+"function": "0050AC00",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "0050F31D",
+"function": "0050E6C0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88eda0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "0050F516",
+"function": "0050E6C0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400b25]"
+]
+},
+{
+"eng": "0051065A",
+"function": "0050E6C0",
+"kind": "B12 level tier",
+"vanilla": [
+"fild dword ptr [esp + 0x24]",
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]"
+],
+"reborn": [
+"mov eax, 1",
+"xor esi, esi",
+"cmp edx, 0xc"
+]
+},
+{
+"eng": "005113C3",
+"function": "0050E6C0",
+"kind": "B12 level tier",
+"vanilla": [
+"fild dword ptr [esp + 0x24]",
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]"
+],
+"reborn": [
+"mov eax, 1",
+"xor esi, esi",
+"cmp edx, 0xc"
+]
+},
+{
+"eng": "0051CC30",
+"function": "0051CC30",
+"kind": "B12 level tier",
+"vanilla": [
+"fild dword ptr [esp + 4]",
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]"
+],
+"reborn": [
+"mov eax, 1",
+"xor esi, esi",
+"cmp edx, 0xc"
+]
+},
+{
+"eng": "00559F08",
+"function": "00559BF0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400fc4]"
+]
+},
+{
+"eng": "0055A149",
+"function": "00559BF0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400fc8]"
+]
+},
+{
+"eng": "0055A248",
+"function": "00559BF0",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"fmul dword ptr [0x400fc8]"
+]
+},
+{
+"eng": "0056D0DB",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fld dword ptr [0x88e66c]"
+],
+"reborn": [
+"fld dword ptr [0x400faf]"
+]
+},
+{
+"eng": "0056D0F2",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fld dword ptr [0x88edf0]"
+],
+"reborn": [
+"fld dword ptr [0x400fb3]"
+]
+},
+{
+"eng": "0056D0FC",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fld dword ptr [0x88edec]"
+],
+"reborn": [
+"fld dword ptr [0x400fb7]"
+]
+},
+{
+"eng": "0056D106",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fld dword ptr [0x88e750]"
+],
+"reborn": [
+"fld dword ptr [0x400fbb]"
+]
+},
+{
+"eng": "0056D110",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fld dword ptr [0x88ede8]"
+],
+"reborn": [
+"fld dword ptr [0x400fbf]"
+]
+},
+{
+"eng": "00570956",
+"function": "0056B130",
+"kind": "B13 constant load",
+"vanilla": [
+"fmul dword ptr [0x88ecb0]"
+],
+"reborn": [
+"jmp 0x400aa0",
+"nop "
+]
+},
+{
+"eng": "0058E516",
+"function": "005893B0",
+"kind": "B12 level tier",
+"vanilla": [
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]",
+"fadd dword ptr [0x88e918]"
+],
+"reborn": [
+"mov ecx, dword ptr [esp + 0xc]",
+"mov eax, 1",
+"cmp ecx, 0xc"
+]
+},
+{
+"eng": "0058E59A",
+"function": "005893B0",
+"kind": "B12 level tier",
+"vanilla": [
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]",
+"fadd dword ptr [0x88e918]"
+],
+"reborn": [
+"mov ecx, dword ptr [esp + 0xc]",
+"mov eax, 1",
+"cmp ecx, 0xc"
+]
+},
+{
+"eng": "0058E611",
+"function": "005893B0",
+"kind": "B12 level tier",
+"vanilla": [
+"fld st(0)",
+"fmul dword ptr [0x88f0b4]",
+"fadd dword ptr [0x88e918]"
+],
+"reborn": [
+"mov edx, dword ptr [esp + 0xc]",
+"mov eax, 1",
+"cmp edx, 0xc"
+]
+}
+]

@@ -198,6 +198,19 @@ handlers, together with a branch each: `jne -> je` / `je -> jmp` that skips a co
 table as `1.06, 1.08, 1.10, 1.12, 1.14` (`0x400FAF..0x400FBF`): the per-difficulty or per-tier damage factors become much flatter.
 Needs the constants exposed: **API** `gear.data.constants` (named float table of the exe's combat constants) or the damage hook.
 
+## Hook sites for B12 and B13 (`data/hook_sites_b12_b13.json`): code sites, not data
+
+ReBorn does not change the constants' data: it points individual instructions at other constants. The pooled floats are shared by many users
+(`0.2` at ENG `0x890DA0` has 29 users, `0.01` at `0x890CB0` 331, the difficulty factors 64 each, `1.0`/`2.0` 110), so a `gear.data.constants` write
+would change every user, not the four hit handlers. The 23 sites are instructions inside functions:
+- **B12 (6):** `FUN_0051CC30` (one caller, `call` at `0x511DFD` in `FUN_0050E6C0`) and five inlined copies of the same 8-instruction expression
+  (`0x51065A`, `0x5113C3` in `FUN_0050E6C0`; `0x58E516`, `0x58E59A`, `0x58E611` in `FUN_005893B0`): `fild level; ...; fdivp; call __ftol`.
+  There is no shared helper for the inlined ones.
+- **B13 (17):** the hit handlers' two `fmul [const]` each (`0x505439`, `0x505624`, `0x50758F`, `0x507793`, `0x50BACC`, `0x50BCB4`, `0x50F31D`,
+  `0x50F516`), three in `FUN_00559BF0` (`0x559F08`, `0x55A149`, `0x55A248`), five `fld [const]` and one `fmul` in `FUN_0056B130` (`0x56D0DB..0x56D110`,
+  `0x570956`). ReBorn's replacements are 1.0 (`0x400B25`), 0.01 / 0.05 (`0x400FC4` / `0x400FC8`), the five factors 1.06..1.14 (`0x400FAF..BF`), and
+  `[0x400625]` / a jump to appended code (`0x400AA0`), which are not plain constants (a variable or code).
+
 ## B14 Spell parameters inside the effect function `FUN_00571710` (12 hunks) - characterised
 
 Immediate values pushed as arguments for individual spells change: `5 -> 0x14` (x2), `0xF -> 0x14` and `0xF -> 0x78`, `0x482 -> 0x496`
