@@ -154,7 +154,7 @@ gear.task(function()
     -- from two runs of tools/textdump; the text depends on the language, so only for the language it was made in)
     local tc = gear.read('text_checks.json')
     tc = tc and gear.json.decode(tc)
-    if tc and tc.language == gear.settings.get('LANGUAGE') then
+    if tc and tc.language == gear.settings.game('LANGUAGE') then
         for _, c in ipairs(tc.checks) do
             check(('text %d is from ReBorn'):format(c.id), gear.text.get(c.id) == c.text, gear.text.get(c.id))
         end
