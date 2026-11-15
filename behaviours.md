@@ -181,6 +181,16 @@ effect values above 65534 do not wrap or saturate, which the item and ability nu
 `5500..8500 -> 2000`) rely on. **Not re-creatable from data**: the widths are in the engine's structures. A Lua version needs a damage hook that
 returns a 32-bit value; see the hooks below.
 
+**Decision (John, 2026-11-15): the Lua port keeps the engine's 16-bit damage.** Damage and effect values are not widened, the 65534 cap stays.
+This is a deliberate deviation from ReBorn: ReBorn's numbers above 65534 do not exist here (they wrap/saturate to 65534 as in vanilla).
+How far that matters is measured, not guessed: ReBorn's T2 `base + L*per` reaches at most 25755 (level 100), 38505 (150), 55335 (216), 65280 (255,
+ability 69), T1 `effect1` at most 43200 (216); so the ability values themselves stay below the cap up to level 255, only sums with items and
+multipliers could exceed it (not measured: no high level hero save).
+**Gear API:** `gear.on('damage', function(hit) -> damage)` is a site hook (ENG `0x56DAAB` in `FUN_0056B130`: the `call __ftol` that turns the final
+float damage into the integer the function returns, before the immunity checks); `hit = {damage, victim_type, attacker_type}`; the result is clamped to
+0 .. 65534. ReBorn changes no damage rule beyond the widening and the constants (B12, B13 are applied through `level.factor` and `combat.constant`),
+so the reborn mod does not register a damage handler (its self test only exercises the stub); the hook is there for mods that shape damage.
+
 ## B12 Level tiers instead of a smooth level function (5 hunks) - decoded
 
 `FUN_0051CC30` (and its three inlined copies in `FUN_0050E6C0` x2 and `FUN_005893B0` x3) turn a level into a factor. Vanilla:

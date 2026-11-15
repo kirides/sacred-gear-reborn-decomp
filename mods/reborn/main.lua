@@ -236,8 +236,12 @@ gear.task(function()
     check('creature.ability stubs without an answer: vanilla store 100, add 1000, block 49 (0x31)',
           st and st.ability_store == 100 and st.ability_add == 1000 and st.ability_edx == 49, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
+    check('damage stub without an answer: 12.4 rounds to 12', st and st.damage == 12, st and tostring(st.damage))
 
     -- the same stubs answered by a handler (a fake creature of type 77)
+    local damage_test = gear.on('damage', function(hit)
+        if hit.attacker_type == 77 then return hit.damage + 5 end
+    end)
     local ability_test = gear.on('creature.ability', function(type_id, vanilla, index)
         if type_id ~= 77 then return nil end
         if vanilla == 100 then return 101 end
@@ -255,7 +259,9 @@ gear.task(function()
     check('creature.ability stubs answered by a mod: store 101, add 2000, block 7',
           st and st.ability_store == 101 and st.ability_add == 2000 and st.ability_edx == 7, st and (st.ability_store .. ' ' .. st.ability_add .. ' ' .. st.ability_edx))
     check('creature.ability stubs answered: registers survive', st and st.ability_kept, st and tostring(st.ability_kept))
+    check('damage stub answered by a mod (attacker type 77): 12 + 5', st and st.damage == 17, st and tostring(st.damage))
     gear.off(ability_test)
+    gear.off(damage_test)
 
     -- real play: does the hero's own code reach the engine's hook sites? (informational; counters per site are logged)
     if gear.config.fight > 0 then
