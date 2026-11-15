@@ -65,6 +65,11 @@ local REBORN_CONSTANTS = {
     ['scale.559BF0'] = {0.01, 0.05, 0.05},
 }
 gear.on('combat.constant', function(name, vanilla, index)
+    if name == 'difficulty.scale' then
+        -- ReBorn's appended code divides the 0.01 of one damage scale by 1, 1, 1, 2, 4 for the difficulty levels 0 .. 4
+        local d = gear.game.difficulty() or 0
+        return vanilla / (d >= 4 and 4 or d == 3 and 2 or 1)
+    end
     local list = REBORN_CONSTANTS[name]
     return list and list[index + 1]
 end)
@@ -229,6 +234,7 @@ gear.task(function()
     local cs = gear.hooks.stats('combat.constant')
     print(('combat.constant hook: %d calls, %d answered, %d busy'):format(cs.calls, cs.answered, cs.busy))
     results.combat_constant = cs
+    check('difficulty level of the running game', (gear.game.difficulty() or -1) >= 0 and gear.game.difficulty() <= 4, gear.game.difficulty())
     check('the level.factor hook answered the engine', hs.answered >= 7, ('%d calls, %d answered, %d busy'):format(hs.calls, hs.answered, hs.busy))
 
     -- which of the overlay's files the game really opened through it (informational; some are only read in some places)
