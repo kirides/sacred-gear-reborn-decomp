@@ -2,6 +2,7 @@
 # Sacred ReBorn by the Sacred ReBorn Overlookers group. `patch:` rules apply a Lua patch to the game's own file (gear/overlay.cpp).
 saves = save    # ReBorn games live in the mod folder; the original game saves stay untouched
 scripts\de\global.res = patch:patches\texts\de.lua
+scripts\ru\global.res = patch:patches\texts\ru.lua
 scripts\us\global.res = patch:patches\texts\us.lua
 bin\addon\netscript\defpos.bin = patch:patches\defpos\addon_netscript\defpos.lua
 bin\addon\netscript\funkcode.bin = patch:patches\scripts\addon_netscript\funkcode.lua
