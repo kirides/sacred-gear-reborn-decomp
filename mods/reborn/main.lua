@@ -349,6 +349,33 @@ gear.task(function()
     gear.off(effect_test)
     effect_handler = gear.on('effect.add', effect_add)
 
+    -- pointed test of the skill slot keys: which way of typing a digit reaches the slot hook (informational)
+    if gear.config.slotkeys then
+        gear.config.quick_cast = true
+        A.move(900, 400)
+        gear.wait(1)
+        local function calls() return gear.hooks.stats('skillslot.select').calls end
+        local hero = gear.world.hero()
+        local function where() local x, y = hero:position(); return ('%.0f,%.0f'):format(x or 0, y or 0) end
+        print('hero before the slot keys at ' .. where())
+        for _, down in ipairs({false, true}) do
+            print(('cursor_click(down=%s): %s'):format(tostring(down), tostring(gear.game.cursor_click(down))))
+            gear.wait(2)
+            print(('hero after the click at %s'):format(where()))
+        end
+        for _, way in ipairs({'type', 'press', 'key_down_up'}) do
+            for key = 1, 5 do
+                local before = calls()
+                local k = tostring(key)
+                if way == 'type' then A.type(k) elseif way == 'press' then A.press(k)
+                else A.key_down(k); gear.wait(0.1); A.key_up(k) end
+                gear.wait(0.6)
+                print(('slot key %s via %s: %d new slot hook calls'):format(k, way, calls() - before))
+            end
+        end
+        gear.config.quick_cast = false
+    end
+
     -- real play: does the hero's own code reach the engine's hook sites? (informational; counters per site are logged)
     if gear.config.fight > 0 then
         local function sitecalls()

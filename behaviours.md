@@ -155,11 +155,15 @@ them as follows:
 
 **Gear API (implemented):** `gear.settings.game(key)` reads `Settings.cfg`; the event `skillslot.select` (five site hooks in ENG `0x6E1BC0`, after a digit key chose
 a slot: four `mov byte [esp+0x13], 1` that follow the `call 0x6E1A20` selection and the last `call` itself) and `gear.game.cursor_click()`, which sends the
-engine's window event handler (ENG `0x6172C0`, found by a window 0x30 bytes inside because SacredBild detours its start) a mouse-up event
-(class vtable ENG `0x899248`, type 2, the cursor `0x182EE18/1C`) at the object ENG `0xAD6EF8`, as ReBorn's cave does. `mods/reborn` clicks when `SR_QUICK_CAST`
-is `1`. **Not verified in real play:** injected digit characters did not reach the five sites in the fight harness (the stubs are verified on
-functions built in memory), and whether Bild's coordinate remapping of the world mouse hook agrees with the cursor globals still has to be seen with a
-real key press. ReBorn's other change in that handler (a cave at `0x1ACC770` that routes the keys `1`..`7` to the slot actions) is not re-created. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
+engine's window event handler (ENG `0x6172C0`, found by a window 0x30 bytes inside because SacredBild detours its start) a mouse **button down** event
+(class vtable ENG `0x89704C`, the signature pairing of ReBorn's `0x8950A8`; type 2, the cursor `0x182EE18/1C`) at the object ENG `0xAD6EF8`, as ReBorn's cave does;
+`gear.game.cursor_click(false)` sends the button up class (`0x899248`) instead. `mods/reborn` clicks when `SR_QUICK_CAST` is `1`.
+**Verified in real play (pointed run, `-SlotKeys`):** the five slot sites fire on a digit key whether it is typed as a character, pressed or held,
+**but only with `COMBINE_SLOTS : 1` in `Settings.cfg`**: the handler asks the setting (ENG `0x81CF80`, string `COMBINE_SLOTS`) before it selects a slot;
+with 0 the keys never reach the sites. **Not verified:** that the injected event makes the game act: with no skill chosen a direct `cursor_click()`
+did not walk the hero (event position equals the mouse's, `597,341`), so either the world mouse handler needs more than the event (SacredBild's
+hook remaps its position, the button state of `cMouse` ...) or a click needs a chosen skill. Still to find out with a hero that has a skill selected.
+ReBorn's other change in that handler (a cave at `0x1ACC770` that routes the keys `1`..`7` to the slot actions) is not re-created. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
 
 ## B9 Hooks into appended code (43 hooks)
 

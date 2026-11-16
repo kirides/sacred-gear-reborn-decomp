@@ -11,6 +11,7 @@ return {
         timeout_game = 180,     -- self test: seconds to wait for the game after loading
         fight = 0,              -- self test: spawn wolves next to the hero and play on this many seconds (the hit code runs)
         idle = 0,               -- self test: seconds to play on (idle in the world) before the checks end
+        slotkeys = false,       -- self test: press the skill slot digit keys and count the slot hook's calls
         quit = true,            -- self test: end the game when done
     },
 }
