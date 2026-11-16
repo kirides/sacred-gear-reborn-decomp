@@ -31,3 +31,6 @@ have a patch: the other eight of ReBorn have no file in the game to compare with
 They are made mechanically: `tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy` writes ReBorn's full files, then
 `tools/make_patches.py --full out-test/fullmod --gog <game folder> --out mods/reborn` compares them with the game's files (every patch is applied again in memory
 and must give ReBorn's file before it is written). The checked-in result was verified in the game: all 52 patched files built by Gear are byte-identical to ReBorn's.
+
+Everything above in one command (also after a new ReBorn release): `python tools/regenerate_mod.py --reborn <ReBorn folder> --base <German sacred.exe> --gog <English GOG folder> --map <map_de_eng.json> [--total ... --versions ...]`;
+running it again on the same inputs gives the checked-in files unchanged.
