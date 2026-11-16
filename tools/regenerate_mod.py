@@ -6,7 +6,8 @@
       [--total <TOTAL changelist.docx> --versions <changelist by versions.docx>]
 
   1. tools/reborn_port.py writes ReBorn's full data files and the rules (out-test/fullmod),
-  2. tools/make_patches.py turns them into delta patches against the GOG files (mods/reborn/patches, overlay.txt),
+  2. tools/gen_constants.py writes the constant tables (CREATURE, ITEM, OPCODE) from the game's data, then
+     tools/make_patches.py turns the files into readable patches against the GOG files (mods/reborn/patches, overlay.txt),
   3. tools/changelog_from_docx.py (when the documents are given) writes changes.json.
 The Lua of the mod (main.lua, mod.lua) and abilities_edits.json are not touched by this script.
 """
@@ -38,6 +39,8 @@ def main():
     full = os.path.join(ROOT, 'out-test', 'fullmod')
     run(['-I', os.path.join(HERE, 'reborn_port.py'), '--reborn', a.reborn, '--base', a.base, '--target', os.path.join(a.gog, 'Sacred.exe'),
          '--map', a.map, '--out', os.path.join(ROOT, 'out-test'), '--mod', full, '--data', 'bin', '--copy'])
+    run([os.path.join(HERE, 'gen_constants.py'), '--gog', a.gog, '--out', os.path.join(a.out, 'constants'),
+         '--balance', os.path.join(full, 'data', 'SRB', 'balance.bin')])
     run([os.path.join(HERE, 'make_patches.py'), '--full', full, '--gog', a.gog, '--out', a.out] + sum([['--extra', e] for e in a.extra], []))
     if a.total and a.versions:
         run([os.path.join(HERE, 'changelog_from_docx.py'), '--total', a.total, '--versions', a.versions, '--out', os.path.join(a.out, 'changes.json')])
