@@ -226,6 +226,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--full', required=True, help='the generated mod folder with the full data files (overlay.txt, data/)')
     ap.add_argument('--gog', required=True, help="the game folder whose files are the baseline")
+    ap.add_argument('--extra', action='append', default=[], help="more folders with the game's own files (same layout, e.g. scripts/fr/global.res of "
+                    "a French install): used for files --gog does not have; the game folder must hold the same file when the mod runs")
     ap.add_argument('--out', required=True, help='mods/reborn')
     a = ap.parse_args()
     rules, saves = read_rules(os.path.join(a.full, 'overlay.txt'))
@@ -236,6 +238,9 @@ def main():
     for game, value in rules:
         src = os.path.join(a.full, value.replace(BS, os.sep))
         base = os.path.join(a.gog, game.replace(BS, os.sep))
+        for extra in a.extra:
+            if not os.path.exists(base):
+                base = os.path.join(extra, game.replace(BS, os.sep))
         rel_patch, note = patch_path(game)
         if rel_patch and os.path.exists(src):
             if not os.path.exists(base):

@@ -34,3 +34,10 @@ and must give ReBorn's file before it is written). The checked-in result was ver
 
 Everything above in one command (also after a new ReBorn release): `python tools/regenerate_mod.py --reborn <ReBorn folder> --base <German sacred.exe> --gog <English GOG folder> --map <map_de_eng.json> [--total ... --versions ...]`;
 running it again on the same inputs gives the checked-in files unchanged.
+
+### More languages
+
+ReBorn has ten languages, the English GOG install ships two (`de`, `us`), so only those two have a patch. For another language you need the game's own
+`scripts/<lang>/global.res` of that language (from an install in that language): put it in a folder with the same layout (`<folder>/scripts/fr/global.res`),
+pass the folder with `--extra <folder>` to `tools/regenerate_mod.py` (or `tools/make_patches.py`) and the tool writes `patches/texts/fr.lua`. The same file must
+be in the game folder (`scripts/fr/global.res`) when the mod runs: the patch is applied to it (and refused if its size or crc32 differ).

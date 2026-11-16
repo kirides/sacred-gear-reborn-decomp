@@ -30,6 +30,7 @@ def main():
     ap.add_argument('--base', required=True)
     ap.add_argument('--gog', required=True)
     ap.add_argument('--map', required=True)
+    ap.add_argument('--extra', action='append', default=[], help='more folders with the game files of other languages (scripts/<lang>/global.res)')
     ap.add_argument('--total')
     ap.add_argument('--versions')
     ap.add_argument('--out', default=os.path.join(ROOT, 'mods', 'reborn'))
@@ -37,7 +38,7 @@ def main():
     full = os.path.join(ROOT, 'out-test', 'fullmod')
     run(['-I', os.path.join(HERE, 'reborn_port.py'), '--reborn', a.reborn, '--base', a.base, '--target', os.path.join(a.gog, 'Sacred.exe'),
          '--map', a.map, '--out', os.path.join(ROOT, 'out-test'), '--mod', full, '--data', 'bin', '--copy'])
-    run([os.path.join(HERE, 'make_patches.py'), '--full', full, '--gog', a.gog, '--out', a.out])
+    run([os.path.join(HERE, 'make_patches.py'), '--full', full, '--gog', a.gog, '--out', a.out] + sum([['--extra', e] for e in a.extra], []))
     if a.total and a.versions:
         run([os.path.join(HERE, 'changelog_from_docx.py'), '--total', a.total, '--versions', a.versions, '--out', os.path.join(a.out, 'changes.json')])
 
