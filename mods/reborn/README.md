@@ -22,15 +22,23 @@ version shown is the last version of the "by versions" document. The mod's descr
 
 ## Data: delta patches against the game's own files
 
-The mod does not ship ReBorn's data files whole. `patches/*.lua` are Lua data files with only what differs from the game's shipped file, and `overlay.txt`
-has a `patch:` rule per file: Gear applies the patch the first time the game opens the file, keeps the result in `cache/` and checks the size and crc32 of the
-original. Kinds of patch: tables of 32 bit words (`kind = 'words'`: `balance`, `sets`; the changed words as numbers, floats as `{f = x}`), byte runs (`ops`, with
-insertions and deletions where the size differs: `scripts/<hero type or campaign>`, `defpos/...`) and text tables (`kind = 'texts'`: the new and changed texts by text id, readable: `patches/texts/us.lua`, `de.lua`). Only the languages the game ships (`de`, `us`)
-have a patch: the other eight of ReBorn have no file in the game to compare with and are dropped.
+The mod does not ship ReBorn's data files whole, and no byte-run patches either. `patches/` has Lua data files with only what differs from the game's shipped
+file, and `overlay.txt` has a `patch:` rule per file: Gear applies the patch the first time the game opens the file and keeps the result in `cache/`.
+All of them are readable:
+
+- `kind = 'words'` (`balance.lua`, `sets.lua`): the changed 32 bit words as numbers, floats as `{f = x}`;
+- `kind = 'texts'` (`texts/us.lua`, `de.lua`, `ru.lua`): the new and changed texts by text id. Only the languages the game ships (`de`, `us`) plus `ru`
+  have a patch: the other seven of ReBorn have no file in the game to compare with and are dropped;
+- `kind = 'script'` (`scripts/*.lua`, 5 files for the 40 script files): edits of `FunkCode.bin` / `StartCode.bin` by function name and instruction, mostly
+  the spawn tables of the sectors (`Sector88067Enter`: `{creature type, weight, group}` lists) and two small `CreateObj` edits; the old values are checked
+  before the new ones are written;
+- `DefPos.bin`: nothing. ReBorn's files hold the game's positions; the game derives the rest itself (`docs/file-formats.md`).
+
+Format notes, sources and checks: `docs/file-formats.md`.
 
 They are made mechanically: `tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy` writes ReBorn's full files, then
 `tools/make_patches.py --full out-test/fullmod --gog <game folder> --out mods/reborn` compares them with the game's files (every patch is applied again in memory
-and must give ReBorn's file before it is written). The checked-in result was verified in the game: all 52 patched files built by Gear are byte-identical to ReBorn's.
+and must give ReBorn's file before it is written). The checked-in result was verified in the game: all 42 patched files built by Gear (40 scripts, balance, sets) are byte-identical to ReBorn's (`tools/verify_cache.py`).
 
 Everything above in one command (also after a new ReBorn release): `python tools/regenerate_mod.py --reborn <ReBorn folder> --base <German sacred.exe> --gog <English GOG folder> --map <map_de_eng.json> [--total ... --versions ...]`;
 running it again on the same inputs gives the checked-in files unchanged.

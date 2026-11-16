@@ -34,3 +34,7 @@ Requires Python 3 with `capstone` and `pefile`.
 original ones; `data/` is made by `reborn_port.py --mod mods/reborn --data bin|all`, hard-linked from the ReBorn folder, not kept in git),
 `abilities_edits.json` (ReBorn's values of the exe's ability tables, `tools/abilities.py`) and `main.lua`. Self test on the English GOG exe:
 `Sacred.exe -gear-auto -gear-load=1 -gear-mods=reborn`.
+
+The mod's data is all readable Lua: word tables, text tables, and edits of the compiled scripts by function and instruction (the sector spawn tables);
+`DefPos.bin` needs no patch at all. The mod needs a Sacred Gear with `patch:` rules and `kind = 'script'` (branch `reborn-mod` of sacred-bild for now).
+File formats, what came from where and the checks: [docs/file-formats.md](docs/file-formats.md).
