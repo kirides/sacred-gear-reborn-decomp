@@ -40,7 +40,7 @@ which is how the names were confirmed.
 **What ReBorn changes.** Per script file about 20 instructions (`StartCode.bin`: two bytes in two instructions), the same ones in every hero
 type's file because they all compile the same library: the spawn tables of the sector functions `Sector<N>Enter` (`FillSector`: a 40 byte
 header, then the `0x19` entries: `{creature type, weight, group}`), and two small `CreateObj` edits. `tools/script_edits.py` writes them as
-`patches/scripts/*.lua` (5 files for all 40 script files); Gear's `kind = 'script'` applies them (see `docs/Gear.md` in sacred-bild).
+`patches/scripts/*.lua` (5 files for all 40 script files; `FillSector` edits name the function and the sector, `StartCode.bin` edits the variable); Gear's `kind = 'script'` applies them (see `docs/Gear.md` in sacred-bild).
 
 ## `DefPos.bin` (named positions)
 
@@ -60,6 +60,33 @@ round) and in leftover bytes, i.e. they are copies of the same data that were wr
 makes the written one itself: tested with the Seraphim hero in the test copy, the game's own regeneration of the plain file gave a file whose tables
 equal ReBorn's own written file in every meaningful field (positions, the 80 byte table whole, the 76 byte table except the pointer words), also with ReBorn's
 own scripts. `make_patches.py` therefore ships nothing for DefPos and stops if a future ReBorn release has other positions.
+
+## Names (`mods/reborn/constants/`)
+
+The patches use names instead of numbers: `CREATURE.ANIMATED_CONJURER`, `ITEM.LARGE_TORCH`, `OPCODE.FILL_SECTOR`. The tables are written by
+`tools/gen_constants.py` from the game's own data; Gear defines them as globals (`CREATURE`, `ITEM`, `OPCODE`: the upper case file name) when it reads
+a patch, so the patch files stay plain Lua data. `meta/constants.lua` holds LuaLS annotations of them.
+
+* **Creatures**: the object type catalogue of the game (`gear.data.object_types`, 0x80 byte records; the record's dword at +0x20 is the type id, which is
+  also the key of its name text; kind byte +0x2E is 3 for creatures). `data/object_types.tsv` is a dump of the types that have a name (id, kind, model
+  file, German name; made in the running game with Sacred Gear). The English name is the text of `scripts/us/global.res` with the same key as the
+  German text in `scripts/de/global.res`; where several keys have that German text and their English texts differ, the first key is used and the table
+  says "also: ..." in a comment. Names are upper case; duplicates get `_2`, `_3` in id order.
+* **Items**: the types named in `sets.bin` and the starting items of `balance.bin`, named the same way.
+* **Opcodes**: `CREATE_OBJ` (8), `FILL_SECTOR` (51) and `SET_VAR` (67): the instructions the patches use; names as in the references above, confirmed by
+  the strings in `Sacred.exe` (`FillSector` 0x54D370, `CreateObj` 0x54D4BC, `SetVar` 0x54D104).
+
+## `balance.bin` and `sets.bin` (what is named)
+
+* `sets.bin` (read by 0x42C3E0): a count word, then 66 records of 28 words: ten item type ids (`item_1`..`item_10`), `set_identifier` (word 10),
+  `count_and_index` (word 11: the count of items in the low byte, the index of the set above it **[ref]**), 16 words not named. ReBorn changes one thing: the
+  `set_identifier` of sets 1..65 is 0 (the game's file has a counter 0x9821F1CE + n there; the item code at 0x42C3E0 reads the item ids and the count
+  byte only).
+* `balance.bin`: a count word (the byte size of the global block), then the global block, which the game copies to memory at 0xAD4490 (0x711F64, **[ref]**).
+  Words 361..424 (block +0x5A0): the starting items of the heroes, 8 rows (Seraphim, Gladiator, Battle Mage, Dark Elf, Wood Elf, Vampiress, Dwarf, Daemon)
+  of 8 slots (`slot_1`..`slot_8`): the game gives three lesser healing potions and a torch; ReBorn six potions, a torch and the class's combat art item.
+  The six floats at 0xAD4BA0 (block +0x710) are factors by difficulty (0x56AA10). The other words ReBorn changes (block +0x744 and later, the 2000s after
+  the global block) are listed in `patches/balance.lua` with their position and "not named yet": the structure is not known.
 
 ## Checks
 

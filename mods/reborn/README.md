@@ -26,12 +26,15 @@ The mod does not ship ReBorn's data files whole, and no byte-run patches either.
 file, and `overlay.txt` has a `patch:` rule per file: Gear applies the patch the first time the game opens the file and keeps the result in `cache/`.
 All of them are readable:
 
-- `kind = 'words'` (`balance.lua`, `sets.lua`): the changed 32 bit words as numbers, floats as `{f = x}`;
+- `kind = 'words'` (`balance.lua`, `sets.lua`): the changed 32 bit words; `sets.lua` and the starting items of `balance.lua` with named fields, the rest as
+  words (floats as `{f = x}`) with their position;
 - `kind = 'texts'` (`texts/us.lua`, `de.lua`, `ru.lua`): the new and changed texts by text id. Only the languages the game ships (`de`, `us`) plus `ru`
   have a patch: the other seven of ReBorn have no file in the game to compare with and are dropped;
-- `kind = 'script'` (`scripts/*.lua`, 5 files for the 40 script files): edits of `FunkCode.bin` / `StartCode.bin` by function name and instruction, mostly
-  the spawn tables of the sectors (`Sector88067Enter`: `{creature type, weight, group}` lists) and two small `CreateObj` edits; the old values are checked
-  before the new ones are written;
+- `kind = 'script'` (`scripts/*.lua`, 5 files for the 40 script files): edits of `FunkCode.bin` / `StartCode.bin` by function name and sector, mostly the
+  spawn tables of the sectors (`Sector88067Enter`: `{creature = CREATURE.SKELETON, weight = 40, group = 1}` lists), a few variables (`SoldatCnt`) and two
+  small `CreateObj` edits (hex, with a comment saying what they are); the old values are checked before the new ones are written;
+- `constants/*.lua` (`CREATURE`, `ITEM`, `OPCODE`, made by `tools/gen_constants.py` from the game's data) are the names the patches use; Gear reads them when it
+  applies a patch; `meta/constants.lua` is for the editor (LuaLS);
 - `DefPos.bin`: nothing. ReBorn's files hold the game's positions; the game derives the rest itself (`docs/file-formats.md`).
 
 Format notes, sources and checks: `docs/file-formats.md`.
