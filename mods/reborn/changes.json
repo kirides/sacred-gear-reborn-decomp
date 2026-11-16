@@ -1,0 +1,493 @@
+{
+ "version": "4.6",
+ "total_version": "4.4",
+ "sections": [
+  {
+   "title": "Overview",
+   "items": [
+    "ReBorn based on patch 2.29 from German fans from SacredVault. This patch allows running the game in several windows, makes available language switching through the settings and removes console cheat codes in single-player mode."
+   ]
+  },
+  {
+   "title": "HD – CUSTOM RESOLUTION (beta)",
+   "items": [
+    "Added ability to customize game resolution. Read more in the «REBORN CONFIGURATION» section."
+   ]
+  },
+  {
+   "title": "Tech improvements",
+   "items": [
+    "* Improved game performance.",
+    "* Added possibility to auto-collect gold in multiplayer mode.",
+    "* Added a setting to enable/disable the glow of equipment from resistances. Read more in the «REBORN CONFIGURATION» section.",
+    "* Added quick cast of Combat Arts. More details in «REBORN CONFIGURATION»."
+   ]
+  },
+  {
+   "title": "Bugfixes",
+   "items": [
+    "* Fixed a bug of FPS drops while language of the game text is Russian or Polish.",
+    "* Hotkeys now works with any input language.",
+    "* Fixed various graphical bugs of models and textures.",
+    "* Fixed a bug with \"The Riddle in the Desert\" quest, which make impossible to finish some other “bring-in” quests.\nNOTE: The fix does not affect to saves with already completed \"The Riddle in the Desert\" quest.",
+    "* Fixed a bug with incorrect increasing of the damage due to the final bonus of the following sets:",
+    "* Andiell's Malevolence (Gladiator)",
+    "* Talia-Mel's Vigor (Seraphim)",
+    "* Meg An-Enid's Blizzard (Wood Elf)",
+    "* Amarri's Secret (Battle Mage)",
+    "* D'Brae'Sineltei's Guise (Dark Elf)",
+    "* Arhles T'gaw's Net (Vampiress)",
+    "* Fixed a bug with the cooldown of Multi-Hit in ranged combat for some heroes (the description still shows an incorrect value, but in fact, the cooldown works correctly).",
+    "* Fixed damage calculation bugs for all ranged Combat Arts, including Attack, Multi-Hit and Hard Hit.",
+    "* Fixed a bug with the accumulation of dialog windows through quick save/load in single player mode, which allowed to multiple receiving the reward for one quest.",
+    "* Fixed a bug with displaying the damage of allied heroes in a multiplayer game, due to which the health of enemies became separate for each player and there was no sense in attacking the enemy all together.",
+    "* Fixed a bug with animation spells of other players in multiplayer. The game ignore cast speed modifiers of the allied heroes, which is why the animation and the spell following it could be display not correctly.",
+    "* Fixed a bug that caused some set and unique rings to lose level. The following rings will no longer lose level:",
+    "* Fadalmar’s Salvation",
+    "* Silasa’s Ring of Concentration",
+    "* Ring of Luck",
+    "* Gold ring of Stringth",
+    "* Orcish Bloodhound",
+    "* Poisoned Сhrysopras",
+    "* Amethyst of Concentration",
+    "* Amethyst of Agility",
+    "* Kerub’s Perdition",
+    "* Nix’s Crysopras",
+    "* Dexster’s Chrysopras",
+    "* Fixed a bug that caused the fireballs of the Fadalmar’s set to inflict excessive damage to bosses and some enemies.",
+    "* Fixed a bug due to which the Combat Arts had a limit of 65535 for each type of damage. The same bug was fixed for other sources of damage, such as burning from the «Burning Bone» bonus from Byleth’s and Huron’s sets and bleeding from the «Chance for Open Wounds» bonus.",
+    "* Fixed a bug due to which the «Chance for Open Wounds» bonus did not work on items.",
+    "* Fixed 45 incorrect names of unique items in Russian localization. Corrections are made based on the English language of the game.",
+    "* Fixed a bug due to which enemy did not drop items and did not gave experience if he was killed by the final tick of bleeding from the «Chance for Open Wounds» bonus.",
+    "* Fixed many missing lines of text for all languages supported in ReBorn HD.",
+    "* Various text fixes, especially for the Russian language."
+   ]
+  },
+  {
+   "title": "Global balance",
+   "items": [
+    "Changed multipliers for enemy’s health, damage and experience gained at all difficulties. These multipliers gradually increase as the difficulty level increases.",
+    "Increased multipliers for enemy’s health, enemy’s damage and experience gained, that depend from number of players.",
+    "In multiplayer minimal level for «Silver» difficulty reduced from 20 to 1.",
+    "The counter of region bosses reduced to 2000 for each region."
+   ]
+  },
+  {
+   "title": "Bosses",
+   "items": [
+    "Total",
+    "All big bosses now have significantly more health and do more damage, also give significantly more experience. Now almost all large bosses have some types of resistance extremely strong, while other types of resistance are weak or absent, which requires the use of a certain type of damage against each boss.",
+    "Dragons",
+    "All dragons have significantly increased movement speed and resistance to physical damage. Other resistances depend on the specific dragon, for example, D’Cay is vulnerable to fire, medium protected from magic and extremely resistant to poison. Various dragons have specialties: some poison with blows, others have stronger meteorites, and others move faster.",
+    "Anducar (both forms)",
+    "Significantly increased movement speed of both forms. Anducar-human uses Meteor Storm instead of Fireball. Green sphere and spikes inflict a strong poisoning. Andukar-human is almost invulnerable to fire and magical damage, but vulnerable against physical and poison damage. Andukar-demon – on the contrary. The artificial intelligence of the Andukar-demon was refined, and now the Andukar-demon can deal melee hits and should not stand idle if the hero does not move.",
+    "Forest God and her childrens",
+    "* Forest God: Greatly movement speed. Now invulnerable to all types of damage, except physical.",
+    "* Children of Forest God: Increased health, movement speed, damage from spells and strikes and experience gained. Now has high resistance to all types of damage, except physical. The children summoned by the Forest God no longer have a level limit of 194, due to which they did not attack the high-level heroes first and almost did not deal damage to them.",
+    "Demon-Lords",
+    "Significantly increased movement speed? Damage of thorns increased and is purely magical. Each Demon-Lord is almost immune to two types of damage, depending on the type of Demon-Lord. Now the blue and gray Demon-Lords deals more damage with spikes, and the green and red Demon-Lords inflict poisoning with their hits.",
+    "Carissall the Medusian Guard",
+    "Significantly increased movement speed, hits inflict strong poisoning. Extremely resistant to all types of damage except physical.",
+    "Anducar’s Guard and Anducar’s Elite Guard",
+    "Significantly increased movement speed. Elite ones are extremely resistant to all types of damage, except poison. Usual ones are also vulnerable to poison, but only medium resistant to physical and fire damage. Now all generated Andukar’s Guards have boss status.",
+    "Stygian Elder (Ent)",
+    "Hits inflict strong poisoning. Extremely resistant to all types of damage except fire.\nAdded the status of a large creature that improves level scaling and adds immunity to certain types of control. All Stygian Elders generated in the game are now bosses.",
+    "Crab Queen",
+    "Significantly increased movement speed. Extremely resistant to all types of damage, except fire. Added the status of a large creature that improves level scaling and adds immunity to some types of control.",
+    "Neophystis Hell Blacksmith",
+    "Hits inflict strong poisoning. Extremely resistant to all types of damage except magic.",
+    "Hoth-Yotsog",
+    "Significantly increased movement speed. Extremely resistant to all types of damage, except poison. Added the status of a large creature that improves level scaling and adds immunity to some types of control.",
+    "Captain Vernon",
+    "Significantly increased movement speed. Extremely resistant to all types of damage, except physical. Added the status of a large creature that improves level scaling and adds immunity to some types of control.",
+    "Tuk-Tuk",
+    "Extremely resistant to all types of damage, except poison. Added the status of a large creature that improves level scaling and adds immunity to some types of control.",
+    "Guardians of Captain Vernon’s medallion",
+    "Extremely resistant to poison damage and to another one damage type, depending on type of guardian. Added the status of a large creature that improves level scaling and adds immunity to some types of control.",
+    "Baron DeMordey",
+    "Extremely resistant to poison, medium resistant to physical and magical damage, vulnerable to fire.",
+    "Shaddar",
+    "Extremely resistant to magic, medium resistant to physical and fire damage, vulnerable to poison. Green Sphere inflict strong poisoning.",
+    "Sakkara Demon",
+    "Extremely resistant to fire, medium resistant to physical and poison damage, vulnerable to magic. Significantly increased movement speed. No longer uses low effective ground slam. All Sakkara Demons generated in the game are now always have boss status. Ilith’Bah Sakkara Demon has more health and gives more experience than unnamed Sakkara Demons.",
+    "Giant spiders",
+    "Parameters and experience gained have been significantly increased. Have extremely high resistance to poison, medium resistant to physical and magic damage.",
+    "Burning giant spiders",
+    "Parameters and experience gained have been significantly increased. Have extremely high resistance to everything except magic damage."
+   ]
+  },
+  {
+   "title": "Common enemies",
+   "items": [
+    "Undead",
+    "All undead now practically immune to poison damage.",
+    "Skeletal Mages use Purgatory instead of Petrification.",
+    "Mummies use Purgatory and Lightning Strike instead of Petrification and Gust of Wind.",
+    "Ghosts",
+    "Strengthened parameters, increased experience. All ghosts are resistant to physical damage and another type of damage, depending on the type of ghost.",
+    "Spell-casters",
+    "Improved spell damage progression so that spells don't become harmless as enemies level up. For most spell-casters, the «Plant Cage» spell has been replaced with «Fireball».",
+    "Human mages",
+    "Parameters adjusted, experience increased. Each mage has a high resistance to fire, either magic, or poison, depending on the type of mage. The health of mages additionally increases with level. Human Mages and Sakkara Priests have learned to summon new creatures, some of which you have not seen before.",
+    "Human Soldiers",
+    "The difference in stats and experience between soldiers with light, medium and heavy armor is now more pronounced. Depending on the faction, soldiers have average resistance to fire, magic, or poison.",
+    "Shaddar’Rims and their horses",
+    "Strengthened parameters, increased resistance to physical damage.",
+    "Orks, Goblins, Ogres",
+    "Increased fire resistance, although goblins have a lower resistance than orcs and ogres. Adjusted the parameters of some orcs. Ogres have significantly increased stats and experience.",
+    "Ice goblins",
+    "Have high magic resistance.",
+    "Frost Elves",
+    "Increased stats and experience gained. All Ice Elves receive high magic resistance. Generated ice elf captains have boss status.",
+    "Dark Elves",
+    "Except Elendiars (in rags) for other Dark Elves increased stats and experience gained. All Dark Elves receive high poison resistance. Use Bottomless Pit instead of Combat Kick and a dysfunctional Attack. Generated dark elf shalinors have boss status.",
+    "Minotaur-chieftains",
+    "Increased stats experience gained. All generated minotaurs-chieftains now have boss status.",
+    "Lizards",
+    "Increased stats and experience gained. Each lizard has extremely high resistance to one of the types of damage, depending on the type of lizard.",
+    "Fire trolls, poison trolls, mountain and ice giants",
+    "Increased parameters and experience gained, have high resistance to their elements. Size of trolls increased.",
+    "Nuk-Nuks",
+    "Some of the Nuk-Nuks have a high resistance to fire, the other part of the Nuk-Nuks has a high resistance to magic.",
+    "Dryads",
+    "Parameters and experience gained are increased. All dryads have high resistance to magic damage. Some dryads are additionally protected from fire, while others are additionally protected from poison.",
+    "Frazzlers",
+    "Reworked parameters, all frazzlers have high fire resistance.",
+    "Hell Golems",
+    "Magic damage and resistance replaced with poison damage and poison resistance. Increased parameters and experience gained of grey golems.",
+    "Shadow Guards",
+    "All Shadow Guards now use Ice Shards instead of Plant Cage. Slightly adjusted the parameters and experience gained of all Shadow Guards.",
+    "Cerebropods",
+    "Clas changed from “Monsters” to “Energy Beings”. Reduced movement speed, increased experience. Reworked Cerebropods resistances, now they are extremely resistant to physical damage + one more damage type depending on Cerebropod type. Reduced parameters of pink Cerebropod.",
+    "Mother of hornets, mother of worms, mother of larvas",
+    "Have boss status."
+   ]
+  },
+  {
+   "title": "Companions",
+   "items": [
+    "Campaign companions",
+    "Strengthened Vilbur, Prince Valor, Baroness Villa, Sharifa. Now they feels more like legendary persons of Ancaria.",
+    "Side quest companions",
+    "Moka-minotaur: Increased health and damage dealt.",
+    "NPC Pirate in green and blue suit (could be meet at Pirate Islands): Health increased by several times, damage slightly increased. Could be meet at Pirate Islands as companion in “Death to the Dead” side quest, in which he can easily die from a boss empowered in ReBorn.",
+    "NPC nobble lady in pink dress: Survivability increased. Could be meet in the quest \"Family Ties\", where she can easily die from enemies rempowered in ReBorn."
+   ]
+  },
+  {
+   "title": "Heroes and skills",
+   "items": [
+    "Skills",
+    "For next Skills was removed diminishing returns:",
+    "* Agility – don’t give defense anymore, initial attack bonus is 100% and increases by 20% per level.",
+    "* Parrying – now the initial defense bonus without a shield is 50% and increases by 10% per level, and with a shield the initial defense bonus is 150% and increases by 30% per level.",
+    "* Sword Lore / Axe Lore / Long-handeld Weapons / Ranged Combat / Dual Wielding / Unarmed Combat / Blade Combat – now the initial attack bonus is 50% and increases by 10% per level, and the initial increase in attack speed is 20% and increases by 1% per level.",
+    "Total",
+    "Combat Arts from one group no longer have a total cooldown. This means that using one Combat Art no longer causes a cooldown for other Combat Arts from the same group.",
+    "In single-player mode, all heroes start with 6 health potions instead of 3, and have an additional rune in their backpack, which will allow some builds to start more comfortably and/or just make it easier to start. The backpack will contain the following rune:",
+    "* Gladiator – Dagger Stare",
+    "* Seraphim – Archangel's Wrath (former Lightning Bolt)",
+    "* Daemon – Hell Sphere",
+    "* Dwarw – Cannon Blast",
+    "* Wood Elf – Thorn Bush",
+    "* Battle Mage – Lightning Strike",
+    "* Dark Elf – Explosive Charge",
+    "* Vampiress – Wolf Call",
+    "The damage of spells and similar Combat Arts has been reworked so that heroes with such abilities have all types of damage at their disposal.",
+    "For most buffs duration has been standardized, now it has a fixed duration of 30 sec, 60 sec, or 180 sec. Cooldown of buffs has been adjusted for the new duration (below we do not indicate cooldown change for each buff, in order to offload the changelist).",
+    "Duration of the damage over time Combat Arts has been standardized, all of them have a fixed duration of 8 sec or 20 sec.",
+    "The initial cooldown of almost all Combat Arts has been lowered to increase their relevance in the early stages (below we do not indicate the change in the initial cooldown for each Combat Arts, in order to offload the changelist).",
+    "Cooldown of many Combat Arts has been reworked and standardized taking into account various factors, such as: separate cooldowns, the functionality of each individual Combat Art, new mechanics, and the current and pre-existing meta.",
+    "The following Combat Arts standardized for all heroes:",
+    "* Attack – medium cooldown, initial damage multiplier 50%, damage multiplier per level 5%.",
+    "* Hard Hit – medium cooldown, initial damage multiplier 300%, damage multiplier per level 20%.",
+    "* Multi-Hit – low cooldown, initial damage multiplier 50%, damage multiplier per level 5%.",
+    "* Combat Kick – low cooldown, initial damage multiplier 150%, damage multiplier per level 15%.",
+    "NOTE: Combat Kick of Vampiress in vampire form shows the old damage values, but in fact the damage has increased.",
+    "Gladiator",
+    "* Fist of the Gods – cooldown increased by 50%, animation speed up 37%, damage 500% initial + 50% per level (was 300% initial + 40% per level).",
+    "* Stomping Jump – animation speed up 30%, damage 150% initial + 10% per level (was 100% initial + 20% per level), stun radius 5,00m initial + 0,03m per level (was 4,00m initial + 0,20m per level).",
+    "* Heroic Courage – fixed duration 180 sec, attack/defense 100% initial + 10% per level (was 70% initial + 20% per level).",
+    "* Dagger Stare – fixed duration 30 sec, damage increased by about 7 times.",
+    "* Throwing Blades – damage 600% initial + 125% per level (was 200% initial + 25% per level), could be used while mounted.",
+    "* Awe – reduced cooldown by 50%, fixed stun duration 8 sec.",
+    "* Backbreaker – cooldown reduced by 6 times.",
+    "Seraphim",
+    "* Lightning Bolt – animation speed up by 27%, cooldown reduced by 2 times, deal high damage of all types, name changed to “Archangel’s Wrath” for better displaying new damage concept.",
+    "* Celestial Light – animation speed up by 17%, cooldown reduced by 3 times, fixed duration 20 sec, damage increased by 2,66 times, damage types changed from magic (100%) to magic/poison (75%/25%).",
+    "* Rotating Blades of Light – cast animation speed up by about 48%, fixed duration 30 sec, damage increased by 5 times, damage type ration physical/magic changed from 50%/50% to 75%/25%, removed activity sound of Combat Art.",
+    "* Light – cast animation speed up by about 48%, fixed duration 30 sec, damage increased by 5 times and inflict to all enemies, damage types changed from magic (100%) to fire/magic (75%/25%), lighting radius (initial / per level / max) respectively changed from (425 / 25 / 700) to (300 / 1 / 800).",
+    "* Strength of Faith – cast animation speed up by about 48%, initial duration 180 sec + 1 sec per level (max 300 sec), attack 200% initial + 20% per level (was 75% initial + 25% per level).",
+    "* Light Shield – cast animation speed up by about 48%, initial duration 180 sec + 1 sec per level (max 300 sec), removed activity sound of Combat Art.",
+    "* Energy Bolts – fixed duration 90 sec, damage increased by 8,5 times, damage types changed from physical/magic (43%/57%) to physical/fire (50%/50%).",
+    "* BeeEffGee – cast animation speed up by 2,85 times, fixed duration 90 sec, damage increased by 3 times, damage types changed from physical (100%) to magic/poison (50%/50%).",
+    "* Combat Jump – animation speed up by 2,5 times, damage 500% initial + 50% per level (was 100% initial + 20% per level).",
+    "* Whirling Hit – cooldown reduced by 2 times, animation speed up by 2,85 times, damage 200% initial + 20% per level (was -25% initial + 5% per level), fixed knockback distance 5.00.",
+    "* Hunter-seeker – animation speed up by 3,3 times, damage 150% initial + 10% per level (was 50% initial + 15% per level).",
+    "* Conversion – animation speed up by 40%, cooldown reduced by 4,5 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 15 sec initial + 1 sec per level, 25 sec max).",
+    "* Irritation – animation speed up by 21%, cooldown reduced by 4,5 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 15 sec initial + 1 sec per level, 30 sec max).",
+    "* Casting animations on horseback have been slightly speed up to match casting animations while unmounted.",
+    "Daemon",
+    "* Increased basic attack speed with crossbows by 1,66 times.",
+    "* Blazing Disc – cooldown reduced by 6 times, fixed duration 20 sec, damage increased by 33%, damage type ratio physical/fire changed from 47%/53% to 75%/25%.",
+    "* Hell Sphere – cooldown reduced by 5 times, fixed duration 20 sec, damage increased by 2times, damage type ratio magic/fire changed form 50%/50% to 75%/25%.",
+    "* Abysmal Choir – cooldown reduced by 2,25 times, works against all enemies, fixed duration 8 sec, damage increased by 4,66 times, damage types changed from physical/magic (50%/50%) to poison/fire (75%/25%).",
+    "* Dread – cooldown increased by 2,25 times, fixed duration 20 sec, decreased progression of attack and defense reduction.",
+    "* Infernal Power – fixed duration 180 sec, attack 100% initial +10% per level (was 40% initial + 20% per level), fire damage 50% initial + 1% per level (was 30% initial + 5% per level).",
+    "* Tentacles – fixed duration 60 sec, tentacles duration reduced from 10 to 8 sec, damage increased by 3 times, damage types changed from poison/magic (75%/25%) to poison/fire (75%/25%).",
+    "* Call of Death – fixed duration 60 sec, damage boost reduced by 3 times (contrary to the description, it does not stop growing after 6%).",
+    "* Soaring Daemon – cooldown reduced by 6 times, cast animation speed up by 2 times, defense 100% initial + 10% per level (was 15% initial + 5% per level), speed 20% initial + 1% per level (was 10% initial + 2% per level).",
+    "* Descent (Soaring Daemon) – cooldown increased by 4 times, damage 300% initial + 20% per level (was 50% initial + 15% per level).",
+    "* Battle Daemon – cast animation speed up by 2,66 times, fixed duration 180 sec, physical resistance 40 initial + 15 per level (was 30 initial + 20 per level), physical damage 50% initial + 1% per level (was 19% initial + 5% per level), attack 100% initial +10% per level (was 19% initial + 5% per level).",
+    "* Assail/Attack (Battle Daemon) – animation speed up by 1,5-2,33 times, depending on weapon type.",
+    "* Energy Daemon – cast animation speed up by 2,66 times, fixed duration 180 sec, magic resistance 40 initial + 15 per level (was 30 initial + 20 per level).",
+    "* Fire Daemon – cast animation speed up by 2,66 times, fixed duration 180 sec, fire resistance 40 initial + 15 per level (was 30 initial + 20 per level).",
+    "* Poison Daemon – cast animation speed up by 2,66 times, fixed duration 180 sec, poison resistance 40 initial + 15 per level (was 30 initial + 20 per level).",
+    "* Charged Bolts (Energy Daemon) – cooldown reduced by 25%, animation speed up by about 2 times, damage increased by 2,4 times.",
+    "* Wall of Flames (Fire Daemon) – cooldown reduced by 25%, animation speed up by about 2 times, damage increased by 2,4 times.",
+    "* Poison Ring (Poison Daemon) – cooldown reduced by 25%, animation speed up by about 2 times, damage increased by 2,4 times.",
+    "Dwarf",
+    "* Multi-Hit – animation speed up by 115% for unarmed combat.",
+    "* Recoil – cooldown reduced by 25%, damage 200% initial + 15% per level (was 0% initial + 10% per level), initial knockback range increased by 100%, knockback range per level reduced by 40%.",
+    "* Vehemence – cooldown increased by 50%, damage 200% initial + 15% per level (was 50% initial + 15% per level).",
+    "* Battle Rage – fixed duration 180 sec, berserk 50% initial + 1% per level (was 30% initial + 3% per level), bonus to minimal attack speed fixed 35 (was 30 initial + 2 per level), removed activity sound of Combat Art.",
+    "* War Cry – fixed duration 180 sec, attack/defense 100% initial + 10% per level (was 50% initial + 10% per level).",
+    "* Dwarven Steel – fixed duration 180 sec, decreased progression of physical resistance ruduction, attack 100% initial + 10% per level (was 25% initial + 10% per level).",
+    "* Dwarven Armor – fixed duration 180 sec, resistances poison/fire 40 initial + 15 per level (was 25 initial + 22 per level).",
+    "* Greed – fixed duration 60 sec, decreased progression of defense reduction, finding especial items 20 initial + 2 per level (was 20 initial + 5 per level).",
+    "* Entrench – cooldown increased by 8 times, fixed duration 8 sec, resistances increased by 5 times, defense increased by 6,25 times.",
+    "* Landmine – cooldown reduced by 4 times, damage greatly increased, damage types changed from physical/fire (53%/47%) to magic/poison (50%/50%), fixed mines amount 1.",
+    "* Flamethrower – cooldown reduced by 55%, damage reduced by 3 times.",
+    "* Mortar Grenade – cooldown reduced by 2 times, damage reduced by 2,25 times.",
+    "* Cannon Blast – cooldown reduced by 2 times, damage reduced by about 11%.",
+    "* Reworked blacksmith bonuses from «Forging» skill. Comparison of bonuses in the \"before / after\" format can be found here:",
+    "RUS:https://drive.google.com/drive/folders/1RcskQZF0GKsOSmy9_hZNdpV10M9wyPon?usp=sharing\nENG:https://drive.google.com/drive/folders/1V4iiWQLxkZOxcTjEsootQRqVanC_yFTP?usp=sharing",
+    "Wood Elf",
+    "* Thorn Bush – damage slightly increased, damage types changed from poison (100%) to physical/poison (75%/25%).",
+    "* Call of the Ancestors – cooldown reduced by 3 times, fixed duration 20 sec, can be reactivated before duration ends, damage increased by 14%, damage types changed from physical/magic (71%/29%) to fire/poison (75%/25%).",
+    "* Poisoned Tendrils – cooldown reduced by 3 times, fixed duration 8 sec, damage increased by 3 times, damage types ratio changed from magic/poison 25%/75% to 75%/25%, amount of tendrils reduced by 2 times, changed progression of tendrils amount (max 3 at 69 Combat Art level).",
+    "* Companion of the Woods – greatly increased unicorn parameters, unicorn level is equal to Combat Art level (was 5 unicorn levels per 1 Combat Art level) cooldown reduced by 2 times. Unicorn deal physical and magic damage.",
+    "* Quick as Flash – fixed duration 180 sec, speed 20% initial + 1% per level (was 15% initial + 2% per level), attack bonus increased by about 2 times, removed activity sound of Combat Art.",
+    "* Recuperation – cooldown reduced by 20%.",
+    "* Plant Cage – cooldown reduced by 6 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 15 sec initial + 1 sec per level, 30 sec max).",
+    "* Transformation – cooldown reduced by 3,75 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 15 sec initial + 1 sec per level, 30 sec max).",
+    "* Penetrating Arrow – fixed duration 8 sec (was 6 sec initial + 0,35 sec per level), damage 50% initial + 5% per level (was -25% initial +5% per level).",
+    "* Explosive Arrow – cooldown increased by 8%, damage 500% initial + 50% per level (was 170% initial + 35% per level).",
+    "* Multiple Shot – duration increased from 20 to 60 sec, decreased progression of the number of arrows (5 arrows at 24 level, 6 arrows at 56 level, 7 arrows at 409 level).",
+    "* Knockback Arrow – cooldown reduced by 2,1 times, initial knockback distance increased from 15 to 50, added 2 knockback distance bonus per level.",
+    "* Spider Arrow – cooldown increased by 33%, fixed amount of spiders 1, increased parameters of spiders, spiders level is equal to Combat Art level (was 5 spider levels per 1 Combat Art level, max 216 level).",
+    "* Casting animations on horseback have been speed up to match casting animations while unmounted.",
+    "Battle Mage",
+    "* Fireball – damage increased by 2,2 times, damage types changed from fire/magic (67%/33%) to fire (100%).",
+    "* Purgatory – cooldown reduced by 3 times, fixed duration 20 sec, damage increased by 2,2 times, damage types changed from fire/magic (67%/33%) to fire/poison (50%/50%).",
+    "* Fire Spiral – cooldown reduced by 3 times, fixed duration 8 sec, damage reduced by 33%, damage types ratio fire/magic changed from 67%/33% to 50%/50%.",
+    "* Flameskin – fixed duration 30 sec, damage increased by 6,7 times, fire resistance 50 initial + 30 per level (was 25 initial + 40 per level), removed hidden defense bonus.",
+    "* Meteor Storm – cooldown reduced by 40%, damage reduced by 10%, damage types ratio physical/fire changed from 82%/18% to 50/50%.",
+    "* Stoneskin – fixed duration 180 sec, defense 100% initial + 10% per level (was 20% initial + 5% per level), resistance physical 30 initial + 20 per level (was 25 initial + 40 per level), resistance poison 15 initial + 10 per level (was 10 initial + 15 per level).",
+    "* Petrification – cooldown reduced by 6 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 15 sec initial + 1 sec per level, 30 sec max).",
+    "* Circle of Fear – cooldown increased by 9 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 25 sec initial + 2 sec per level, 90 sec max).",
+    "* Gust of Wind – cooldown increased by 33%, increased initial damage to compensate for the small initial size.",
+    "* Whirlwind – fixed duration 30 sec, damage multiplied to “Flameskin” damage values (was too small, symbolic), damage types change from physical (100%) to poison (100%), removed activity sound of Combat Art.",
+    "* Lightning Strike – damage increased by 6 times, damage types changed from physical/magic (40%/60%) to magic (100%), initial amount of bounces reduced from 3 to 2.",
+    "* Phase Shift – cooldown reduced by 2 times, casting speed up by 2 times, range 40 initial +1 per level, max range unlimited (was 90 initial + 10 per level, 200 max), can’t be used while mounted.",
+    "* Ice Shards – cooldown increased by 33%, increased initial damage to compensate for the small initial size.",
+    "* Frost Ring – cooldown reduced by 33% fixed duration 8 sec, damage increased by 2 times, damage types ration physical/magic changed from 40%/60% to 50%/50%.",
+    "* Water Form – cooldown increased by 2 times, duration 20 sec initial + 1 sec per level, max duration unlimited (was 10 sec initial + 1 sec per level, max 30 sec), can be used while mounted.",
+    "* Cataract of Agility – fixed duration 180 sec, speed 20% initial + 1% per level (was 15% initial + 2% per level), attack bonus increased by 4,3 times, removed activity sound of Combat Art.",
+    "* Ghost Meadow – fixed duration 180 sec, cooldown reduction 50% initial + 1% per level (was 100% initial + 5% per level).",
+    "* Reiki – fixed duration 180 sec, health regeneration 500% initial + 80% per level (was 150% initial + 15% per level).",
+    "* Shield Wall – fixed duration 180 sec, removed hidden physical resistance (was 4 initial + 6 per level), removed poison resistance (was 4 initial + 6 per level), magic resistance 30 initial + 20 per level (was 25 initial + 40 per level), fire resistance 15 initial + 10 per level (was 4 initial + 6 per level), removed activity sound of Combat Art.",
+    "* Spiritual Healing – animation speed up by 2,3 times, cooldown reduced by 20%.",
+    "* Casting animations on horseback have been speed up to match casting animations while unmounted.",
+    "Dark Elf",
+    "* Explosive Charge – cooldown increased by 50%, damage increased by about 48%, damage types changed from physical/fire (43%/57%) to magic/poison (75%/25%).",
+    "* Bottomless Pit – cooldown reduced by 25%, fixed duration 20 sec, damage increased by 11%, damage types ratio fire/poison changed from 50%/50% to 75%/25%.",
+    "* Poison Mist – cooldown increased by 2 times, fixed duration 20 sec, initial damage increased by 20%.",
+    "* Confusion – cooldown increased by 3 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 20 sec initial + 1 sec per level, 50 sec max).",
+    "* Battle Fog – cooldown increased by 8 times, initial duration 8 sec + 1 sec per level, max duration unlimited (was 20 sec initial + 1 sec per level, 60 sec max).",
+    "* Testosterone – fixed duration 180 sec, poison damage 50% initial +1% per level (was 25% initial + 5% per level), attack 100% initial + 10% per level (was 50% initial + 20% per level), removed activity sound of Combat Art.",
+    "* Adrenaline – fixed duration 180 sec, health regeneration 250% initial + 40% per level (was 25% initial + 5% per level), defense 100% initial + 10% per level (was 50% initial + 20% per level), removed activity sound of Combat Art.",
+    "* Projectile Deflection – fixed duration 180 sec, damage 50% initial + 5% per level (was 5% + 5% per level).",
+    "* Magic Deflection – fixed duration 180 sec, damage 500% initial + 60% per level (was 5% + 5% per level).",
+    "* Soul Catcher – fixed duration 180 sec, healing 200 initial + 125 per level (was 40 initial + 30 per level), removed activity sound of Combat Art.",
+    "* Mangoose – cooldown reduced by 2 times, animation speed up by about 3 times, range 10,00m initial + 0,08m per level (was 9,00m initial + 1,00m per level).",
+    "* Cobra – cooldown reduced by 3 times, animation speed up by about 3 times, fixed stun duration 8 sec, stun radius 5,00m initial + 0,03m per level (was 3,00m initial + 0,04m per level).",
+    "Vampiress",
+    "* Attack / Hard Hit / Multi-Hit / Combat Kick – in vampire form damage per level reduces from 5% to 3%, to partially compensate the damage bonus accumulated when dealing damage at night.",
+    "* Turn into Vampire – cooldown reduced by 2 times, duration 120 sec initial + 3 sec per level (was 30 sec initial + 6 sec per level).",
+    "* Time Control – parameters became the same for vampire and knight forms: cooldown reduced by 3 times for both forms, range 5,00m initial + 0,04m per level (was 8,50m initial + 0,50m per level in knight form, было 11,00m initial + 1,00m per level in vampire form).",
+    "* Mind Control – parameters became the same for vampire and knight forms: cooldown reduced by 6 times for knight form and by 4,5 times for vampire form, duration 8 sec initial + 1 sec per level (was 20 sec initial + 3 sec per level in knight form, was 25 sec initial + 4 sec per level in vampire form), can be used while mounted.",
+    "* Master Bite – cooldown reduced by 2,25 times, duration 8 sec initial + 1 sec per level (was 15 sec initial + 3 sec per level).",
+    "* Blood Bite – cooldown reduced by 33%, lifesteal 200 initial + 200 per level (was 30 initial + 20 per level).",
+    "* Blood Kiss – cooldown reduced by 25%, fixed duration 20 sec, damage 200 initial + 200 per level (was 11 initial + 1 per level), no more requires target for casting, can be used while mounted.",
+    "* Claw Jump – animation speed up by about 33%, damage 200 initial + 200 per level (was 15 initial + 10 per level), stun radius 5,00m initial + 0,03m per level (was 4,00m initial + 0,20m per level).",
+    "* Awaken Dead – cooldown reduced by 2 times, fixed awakening duration 180 sec (was 30 sec initial + 3 sec per level).",
+    "* Bats: Blood Swarm / Confusion / Guard – greatly reduced initial cooldown, cooldown per level reduced by 2 times (except Guard bats), empowered parameters of bats, bats level is equal to Combat Art level (was depended on hero level and not affected by Combat Art level), changed progression of bats’ amount (additional bats adds at 13, 25 and 37 Combat Art level). Red bats (Blood Swarm) deal physical + fire damage, blue bats (Confusion) deal magic + poison damage, brown bats (Guard) deal physical + poison damage.",
+    "* Wolf Call – cooldown reduced by 33% for both forms, summoning animation speed up by about 2 times, in knight form summon new blue wolf, in vampire form summon old red wolf. Greatly empowered parameters of wolves, wolves level is equal to Combat Art level (was 2-3 wolf levels per 1 Combat Art level). Blue wolf deal physical + magic damage, red wolf deal fire + poison damage."
+   ]
+  },
+  {
+   "title": "Ingame world",
+   "items": [
+    "Now some caves in Ancaria completely inhabited by large bosses. Be extremely careful, these caves can be more dangerous than region bosses can!"
+   ]
+  },
+  {
+   "title": "Items, potions, runes, combo, blacksmith",
+   "items": [
+    "Quality of dropped items increased by 5 times to match the increased difficulty.",
+    "Reworked over 260 items (not including Combat Art runes), you can see screenshots in \"before / after\" format here:\nRUS:https://drive.google.com/drive/folders/1RcskQZF0GKsOSmy9_hZNdpV10M9wyPon?usp=sharing\nENG:https://drive.google.com/drive/folders/1V4iiWQLxkZOxcTjEsootQRqVanC_yFTP?usp=sharing\nAmong reworked items:",
+    "* All for-all unique 1-handed swords (38 items).",
+    "* All for-all unique 2-handed swords (11 items).",
+    "* All for-all unique 1-handed axes (36 items).",
+    "* All for-all unique 2-handed axes (8 items).",
+    "* All for-all unique rings (36 items).",
+    "* All for-all unique ranged weapons (8 items), and also added new unique bow (1 item).",
+    "* All for-all unique long-handed weapons (21 items).",
+    "* All for-all unique 2-handed battle gloves (4 items).",
+    "* All for-all unique blade combat weapons (4 items).",
+    "* Items for sockets: Orbus Dracos and Dragon Scale (2 items).",
+    "* Unique Hood of Madness and Sunglasses for each character (16 items).",
+    "* All unique and set rifles for Dwarf (6 and 1 items accordingly).",
+    "* All unique and set bows for Wood Elf (11 and 3 items accordingly).",
+    "* All unique and set weapons for Dark Elf (15 and 4 items accordingly).",
+    "* All unique weapons and shields for Battle Mage (10 items).",
+    "* Some unique items for Gladiator, Seraphim, and Dark Elf (5 items).",
+    "* All for-all set items (24 items).",
+    "WARNING: In multiplayer mode, parameters of the reworked item can be updated by simply picking up and placing it in the inventory, but this does not always work correctly with jewelry and blacksmith bonuses located in the item sockets. We strongly recommend pulling jewelry out of sockets before updating parameters in this way! Otherwise, it can lead to incomplete updating of jewelry, as well as spoil white/blue/yellow quality items! In single player mode, this method does not work and you need to find updated items by playing the ReBorn HD mod.",
+    "Empowered set bonuses of «Solwemyr's Trial» set.",
+    "Reworked the mechanics of the final bonus for the sets \" Fadalmar's Counsel\" (launching fireballs) and \"Orla-Aisling's Jolt\" (launching energy bols). Fireballs and bolts no longer have a chance to trigger when dealing damage, instead they are guaranteed to trigger one time from any damage (except fatal) after using any Combat Art. The damage of the projectiles launched has been significantly increased for both sets, the number of Orla-Aisling's energy bolts has been increased by about 50%.",
+    "The Combo Master no longer exchange runes, but instead allows you to level up your abilities for gold. This removes the dependence on the chance of a rune drop and removes the need to create special characters for farming runes, and also increases the relevance of the game currency (gold). Purchase price = 1000 gold * Combat Art level.",
+    "Reworked the bonuses of all Combat Art runes (123 runes) to increase the relevance of runes as items for sockets, since they can no longer be exchanged. Rune bonuses allow you to get damage of a certain type, which is especially important in ReBorn HD.",
+    "Potion names are now highlighted with a special color, and at the beginning of the name there is an icon indicating the type of elixir. This will help distinguish potions from other white items.",
+    "Concentration potions have been converted to teleportation potions. When using them, combos are no longer restored, but a portal menu opens, allowing you to move to any open portal. Teleportation potions cannot be used in combat or in territory that does not belong to any region. This change removes the imbalanced possibility to spam combos with concentration potions.",
+    "Combos restores by 2% when you kill an enemy. This allows you to effectively use combos without concentration potions.",
+    "Small and medium antidote potions now completely remove poisoning, rather than just weaken it.",
+    "Added mentor potions to the merchant's assortment (as it was in earlier versions of Sacred).",
+    "A special item for sockets “Glyph of Life” has been added to the merchant's assortment, which costs 25,000 gold and gives 4% of draining life from the enemy (lifeleech). This item compensates for the reworked Vampiress runes, which were often used to obtain a lifeleech, and also allows you to obtain a lifeleech regardless of the dropped items.",
+    "Item bonus \"Each hit drain life from opponent\" (lifeleech), work 2 times weaker on Platinum and 4 times weaker on Niobium.",
+    "The item bonus effect \"Chance to inflict an open wound\" lasts 5 seconds and deals physical damage every second in the amount of 20% of the damage that caused the open wound.",
+    "Reworked blacksmith bonuses to increase their relevance and provide access to in-demand stats that were too dependent on randomness to obtain.",
+    "If come and interact with the combo-master or statues, then all Combat Arts will be fully restored."
+   ]
+  },
+  {
+   "title": "4.4.1: Regular enemies",
+   "items": [
+    "Canceled adding the \"Hirelings\" class to all human-mages.",
+    "Commentary: This change resulted in unexpected quest bugs (thanks to everyone who reported bugs). We do not know how many such bugs have arisen in total, so we decided to remove the root cause without waiting for the players to find all the bugs and at the same time ruin the game experience for themselves. We want to say a special thanks to the Sacred developers, who managed to make scripts break from changing creature parameters."
+   ]
+  },
+  {
+   "title": "4.4.1: Items",
+   "items": [
+    "Fixed a few errors and miscalculations that we made when reworking items."
+   ]
+  },
+  {
+   "title": "4.5: Notes",
+   "items": [
+    "Commentary: In this update, I increased the spell damage bonuses on reworked unique and set items, in return lowered the damage for many spells. By doing this, I want to reduce the effectiveness of mages in the early and middle stages, while increasing the importance of endgame equipment for them. You will see the corresponding changes in the paragraphs \"ITEMS\" and \"HEROES\"."
+   ]
+  },
+  {
+   "title": "4.5: Bugfixes sacred",
+   "items": [
+    "Fixed errors in calculating damage for ranged abilities (including Attack, Multi-Hit and Hard Hit).",
+    "Commentary: In the later and final stages of the game, you will notice an increase in damage with crossbows and bows."
+   ]
+  },
+  {
+   "title": "4.5: Languages",
+   "items": [
+    "Added Brazilian Portuguese language of game text. Language code “PT” for the “SacredReborn config.exe” and the configuration file “Settings.cfg”."
+   ]
+  },
+  {
+   "title": "4.5: Skills",
+   "items": [
+    "Bonus attack speed per level has been reduced from 2% to 1% for the following skills: sword lore, axe lore, long-handed weapons, ranged combat, two weapons, unarmed combat, blade combat."
+   ]
+  },
+  {
+   "title": "4.5: Heroes",
+   "items": [
+    "Gladiator\n- Dagger Stare – duration increased from 20 to 30 sec, cooldown increased by 2 times.",
+    "Seraphim\n- Conversion – animation speed up by 40%.\n- Irritation – animation speed up by 21%.\n- Archangel’s Wrath (former «Lightning Bolt») – animation speed up by 27%, damage reduced by 12%.\n- Celestial Light– animation speed up by 17%, damage reduced by about 17%, damage ratio magic/poison changed from 75%/25% to 50%/50%.\n- Rotating Blades of Light – animation speed up by 17%, damage reduced by about 17%, inflicts pure physical damage, duration increased from 20 to 30 sec, cooldown increased by 2 times.\n- Light – animation speed up by 17%, damage reduced by about 17%, inflicts pure fire damage, duration increased from 20 to 30 sec, cooldown increased by 2 times, light radius initial / per level / max accordingly changed from 425 /25 / 700 to 300 / 1 / 800 accordingly.\n- Strength of Faith – animation speed up by 17%.\n- Light Shield – animation speed up by 17%.\n- Energy Bolts – duration increased from 60 to 90 sec.\n- BeeEffGee – duration increased from 60 to 90 sec.\n- Casting animations on horseback have been slightly speed up to match casting animations while unmounted.",
+    "Daemon\n- Blazing Disc – damage reduced by about 17%, cooldown reduced by 25%.\n- Hell Sphere – damage reduced by about 17%, cooldown reduced by 25%.\n- Abysmal Choir – damage reduced by about 17%.",
+    "Dwarf\n- Multi-Hit – animation speed up 115% for unarmed combat.\n- Greed – duration reduced from 180 to 60 sec, cooldown adjusted for duration.\n- Dwarven Steel – duration increased from 60 to 180 sec, cooldown adjusted for duration.",
+    "Wood Elf\n- Thorn Bush – damage reduced by about 23%.\n- Spider Arrow – amount of spiders reduced to 1 max, parameters of spiders increased.\nCommentary: This change is intended to reduce the performance drops in multiplayer when there are multiple Wood Elves using Spider Arrow.\n- Knockback Arrow – initial knockback distance reduced by 10 times, added 2 knockback distance per level.\n- Casting animations on horseback have been speed up to match casting animations while unmounted.",
+    "Battle Mage\n- Fireball – damage increased by 25%.\n- Fire Spiral – duration reduced from 20 to 8 sec, cooldown reduced by 2 times.\n- Purgatory – damage reduced by about 17%.\n- Flameskin – damage reduced by about 17%, duration increased from 20 to 30 sec, cooldown increased by 2 times.\n- Meteor Storm – damage reduced by about 17%.\n- Lightning Strike – damage increased by 25%.\n- Whirlwind – damage reduced by about 17%, duration increased from 20 to 30 sec, cooldown increased by 2 times.\n- Ring of Ice – damage reduced by about 17%.\n- Casting animations on horseback have been speed up to match casting animations while unmounted.",
+    "Dark Elf\n- Poison Mist – damage reduced by about 17%.\n- Explosive Charge – damage reduced by about 17%.\n- Bottomless Pit – damage reduced by about 17%.",
+    "Vampiress\n- Bats: Blood Swarm – cooldown reduced by 2 times.\n- Bats: Confusion – cooldown reduced by 2 times.\n- Bats: Defense – cooldown reduced by 4 times."
+   ]
+  },
+  {
+   "title": "4.5: Items",
+   "items": [
+    "Corrections\n- Increased damage of Orla-Aisling’s charged by 33% for niobium difficulty.\n- Reduced damage bonus of the Kitten’s Flayer by a quarter.\n- Reduced damage bonus of the Hood of Madness by 2 times.\n- Increased by 1,5 times damage bonuses on unique bow of Battle Mage.\n- Changed the \"joke\" bonuses of the Ozzy Ring to reduce information noise. This did not affect the effectiveness of the ring.\n- Reworked.\n- Some bonus changes on the following rings (14 items): Dragon Ring, Golden Ring of Strength, Silver Pinguit Ring of Riders, Ring of Babbling Kay, The One Ring of All, Amethyst of Heavens, Mountain Hermit’s Ring (former “Silasa’s Ring of Concentration”), Poisoned Crysopras, Greedy Weapon Stealer, Theobit’s Ring of Redemption, Ring of Daemonfear, Silver Gahnite of Peace, Silver Ring of Resting, Sneaking Ring of the Dead.\n- Increased spell damage bonuses on following 1-handed swords (4 items) and axes (2 items): Dirk of Pestilence, Lord Wayne’s Mercy, Lion Dagger of Wood Sprites, Bini's Glowing Dirk, Isarador's Magic Torch, Magical Double-blade of Death-summoners.\n- Empowered spell damage bonuses on items of Solvemyr’s set (4 items).\n- Reworked all for-all unique ranged weapons (8 items).",
+    "New item changes\n- Added new unique bow «Thain’s Bow». It can be guaranteed to be found at the secret grave near Mascarell, where Thain's Axe of Flame lies.\n- Reworked all for-all unique 2-handed swords (11 items).\n- Reworked all for-all unique 2-handed axes (8 items).\n- Reworked all for-all unique long-handed weapons (21 items).\n- Reworked all for-all unique blade combat weapons (4 items).\n- Reworked all unique bows of Seraphim (2 items).\n- Reworked all unique and set bows of Wood Elf (3 and 11 items respectively).\n- Reworked all unique and set weapons of Dark Elf (4 and 15 items respectively).\n- Reworked all unique weapons (which has not yet been reworked) and shields of Battle Mage (8 items)."
+   ]
+  },
+  {
+   "title": "4.5: Bosses",
+   "items": [
+    "Anducar-human uses Meteor Storm instead of Fireball.",
+    "Sakkara Demons no more uses ineffective ground hit."
+   ]
+  },
+  {
+   "title": "4.5: Regular enemies",
+   "items": [
+    "Reverted the class change for dryads as it caused them to stop fighting demons in Dryad Forest.",
+    "Dark Elves now use Bottomless Pit instead of Combat Kick and a dysfunctional Attack.",
+    "Mummies use Purgatory and Lightning Strike instead of Petrification and Gust of Wind.",
+    "Skeleton Mages use Purgatory instead of Petrification.",
+    "Cerebropods class changed from \"monsters\" to \"energetic creatures\". Reduced movement speed, increased experience, redistributed resistances to extremely high resistance to physical damage + another type of damage (depending on the type of cerebropod). The health and damage of Pink Cerebropods has been reduced."
+   ]
+  },
+  {
+   "title": "4.5: Quest companions",
+   "items": [
+    "Reduced the survivability of main quest companions for high difficulties.",
+    "Increased survivability of Svenya from the \"Family Ties\" side quest."
+   ]
+  },
+  {
+   "title": "4.6: Heroes",
+   "items": [
+    "Gladiator\n- Fist of the Gods – damage reduced from 60% to 50%.",
+    "Seraphim\n- Combat Jump – damage reduced from 60% to 50%.",
+    "Dwarf\n- Recoil (2-handed) – cooldown reduced by 2 times.\n- Landmine – damage increased by 66%.\n- Forging – reworked socket bonuses.",
+    "Wood Elf\n- Explosive Arrow – damage reduced from 60% to 50%."
+   ]
+  },
+  {
+   "title": "4.6: Regular enemies",
+   "items": [
+    "Generated ice elf captains and dark elf shalinors now always has boss status."
+   ]
+  },
+  {
+   "title": "4.6: Bosses",
+   "items": [
+    "Giant burning araneida\nGreatly increased physical resistance, experience increased by 3 times.",
+    "Anducar’s guard (non-elite)\nNow has high magic resistance and medium fire resistance (was vice versa)."
+   ]
+  },
+  {
+   "title": "4.6: Boss caves",
+   "items": [
+    "6 caves have become new boss caves (5 in Ancaria and 1 in Underworld). Now there are 11 boss caves in total.",
+    "The composition of the old boss caves has been changed: in some caves it has been slightly supplemented, in others it has swapped between caves, in others it has been completely changed (but it’s old composition can be found in the new boss caves).",
+    "Commentary: As with the first addition of the boss caves, I decided not to specify in which caves exactly which bosses, but instead give the players the opportunity to find them themselves and get an unforgettable experience."
+   ]
+  },
+  {
+   "title": "4.6: Items",
+   "items": [
+    "Some corrections for next unique items:\n- Hack (1-handed sword)\n- Elf Slayer (1-handed sword)\n- Fiery Great Sword of Might (2-handed sword)\n- Battle Stave of Thorwena (long-handed weapon)"
+   ]
+  }
+ ]
+}

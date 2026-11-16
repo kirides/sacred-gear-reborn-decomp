@@ -12,3 +12,10 @@ This folder re-creates it as a mod for [Sacred Gear](https://github.com/kirides/
 - `main.lua`, `mod.lua`: the mod.
 
 Put this folder at `<game>\mods\reborn` and start the game with Sacred Gear (SacredBild's `ddraw.dll` loads it).
+
+## Version and the Changes screen
+
+The mod re-creates **Sacred ReBorn HD 4.6** (the version of `SacredReborn.exe` it was generated from). Its page in the Mods screen (F11) has a **Changes**
+button that opens a window with what ReBorn changes, section by section (`changes.json`). Make that file from the group's changelist documents with
+`python tools/changelog_from_docx.py --total <TOTAL changelist.docx> --versions <changelist by versions.docx> --out mods/reborn/changes.json`; the
+version shown is the last version of the "by versions" document. The mod's description in `mod.lua` names the version too: update both after a new release.

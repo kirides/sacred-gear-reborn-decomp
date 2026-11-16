@@ -165,6 +165,141 @@ gear.on('frame', function()
 end)
 
 ---------------------------------------------------------------------------------------------------------------
+-- The "Changes" screen: the mod's page in the mod manager (Mods screen, F11) shows the ReBorn version and a "Changes" button that opens a
+-- window with what Sacred ReBorn changes, section by section (changes.json, made from the group's changelists by
+-- tools/changelog_from_docx.py).
+---------------------------------------------------------------------------------------------------------------
+local ui = gear.ui
+local changes                       -- changes.json, decoded; false if it is missing
+local function load_changes()
+    if changes == nil then
+        local text = gear.read('changes.json')
+        local ok, data = pcall(gear.json.decode, text or '')
+        changes = (ok and type(data) == 'table' and type(data.sections) == 'table') and data or false
+    end
+    return changes
+end
+
+local TEXT = {size = 13}
+local LINE_H, GAP = 17, 7
+local view = {section = 1, scroll = 0, built = nil, built_width = 0, lines = {}}
+local word_width, space_width = {}, nil
+
+local function measure(word)
+    local w = word_width[word]
+    if not w then
+        w = ui.text_size(word, TEXT) or (#word * 7)
+        word_width[word] = w
+    end
+    return w
+end
+
+-- the text of an item as lines no wider than `width` (the layout's units); a line starting with "- " keeps its hanging indent
+local function wrap(text, width, out)
+    space_width = space_width or measure('n') * 0.6
+    for paragraph in (text .. '\n'):gmatch('([^\n]*)\n') do
+        local line, line_w = '', 0
+        local indent = paragraph:sub(1, 2) == '- ' and '   ' or ''
+        for word in paragraph:gmatch('%S+') do
+            local w = measure(word)
+            if line ~= '' and line_w + space_width + w > width then
+                out[#out + 1] = line
+                line, line_w = indent .. word, measure(indent) + w
+            elseif line == '' then
+                line, line_w = word, w
+            else
+                line, line_w = line .. ' ' .. word, line_w + space_width + w
+            end
+        end
+        out[#out + 1] = line
+    end
+end
+
+local function build(width)
+    local data = load_changes()
+    local section = data and data.sections[view.section]
+    if view.built == view.section and view.built_width == width then return end
+    view.built, view.built_width, view.lines = view.section, width, {}
+    if not section then return end
+    for _, item in ipairs(section.items) do
+        local bullet = item:sub(1, 2) == '* '
+        local lines = {}
+        wrap(bullet and item:sub(3) or item, width - (bullet and 14 or 0), lines)
+        for i, line in ipairs(lines) do
+            view.lines[#view.lines + 1] = {text = line, bullet = bullet and i == 1, indent = bullet and 14 or 0}
+        end
+        view.lines[#view.lines + 1] = {gap = true}
+    end
+end
+
+local function reborn_version()
+    local data = load_changes()
+    return data and data.version or '?'
+end
+
+-- drawn every frame by the `draw` handler; open with gear.ui.show_panel('changes', true)
+local function draw_changes()
+    local data = load_changes()
+    local p = ui.panel('changes', ('Sacred ReBorn HD - Changes (ReBorn v%s)'):format(reborn_version()), 110, 70, 800, 620,
+                       {resizable = true, min_width = 460, min_height = 320, layer = 'top'})
+    if not p.open then return end
+    local c = ui.COLORS
+    if not data then
+        ui.text('changes.json is missing.', p.content_x + 10, p.content_y + 10, {layer = 'top', color = c.text})
+        return
+    end
+    local x, y, w, h = p.content_x + 8, p.content_y + 6, p.content_w - 16, p.content_h - 12
+    -- the section: previous / dropdown / next
+    local titles = {}
+    for i, s in ipairs(data.sections) do titles[i] = s.title end
+    if ui.button('prev', x, y, 28, 22, '<', {layer = 'top'}) and view.section > 1 then view.section, view.scroll = view.section - 1, 0 end
+    local changed, index = ui.dropdown('section', x + 34, y, math.min(w - 68, 360), titles, view.section, {layer = 'top'})
+    if changed then view.section, view.scroll = index, 0 end
+    if ui.button('next', x + 40 + math.min(w - 68, 360), y, 28, 22, '>', {layer = 'top'}) and view.section < #titles then
+        view.section, view.scroll = view.section + 1, 0
+    end
+    -- the text of the section
+    local top, bottom = y + 32, y + h - 30
+    local text_w = w - 6
+    build(text_w)
+    local visible = math.max(1, math.floor((bottom - top) / LINE_H))
+    local total = #view.lines
+    local max_scroll = math.max(0, total - visible)
+    view.scroll = math.max(0, math.min(max_scroll, view.scroll))
+    local at = top
+    for i = view.scroll + 1, math.min(total, view.scroll + visible) do
+        local l = view.lines[i]
+        if l.text then
+            if l.bullet then ui.text('\226\128\162', x + 2, at, {layer = 'top', size = TEXT.size, color = c.accent}) end
+            ui.text(l.text, x + l.indent, at, {layer = 'top', size = TEXT.size, color = c.text})
+        end
+        at = at + (l.gap and GAP or LINE_H)
+        if at > bottom then break end
+    end
+    -- scrolling: buttons and a slider at the bottom
+    local by = y + h - 24
+    if ui.button('up', x, by, 28, 22, '^', {layer = 'top', tooltip = 'Scroll up'}) then view.scroll = math.max(0, view.scroll - 3) end
+    if ui.button('down', x + 32, by, 28, 22, 'v', {layer = 'top', tooltip = 'Scroll down'}) then view.scroll = math.min(max_scroll, view.scroll + 3) end
+    if max_scroll > 0 then
+        local moved, value = ui.slider('scroll', x + 70, by + 3, w - 80, 0, max_scroll, view.scroll, {layer = 'top', step = 1, format = false})
+        if moved then view.scroll = math.floor(value) end
+    end
+end
+
+gear.on('draw', draw_changes)
+
+-- the mod's own page in its Mods screen
+gear.mods.page(function(x, y, w)
+    local c = ui.COLORS
+    ui.label('version', ('Sacred ReBorn HD, ReBorn version %s'):format(reborn_version()), x + 8, y + 8, {layer = 'top'})
+    ui.label('note', 'The balance, bosses, enemies, heroes, items and fixes of the ReBorn mod, re-created on the plain game.', x + 8, y + 30, {layer = 'top'})
+    if ui.button('changes', x + 8, y + 58, 140, 26, 'Changes', {layer = 'top', tooltip = 'What Sacred ReBorn changes, section by section'}) then
+        ui.show_panel('changes', true)
+    end
+    return 96
+end)
+
+---------------------------------------------------------------------------------------------------------------
 -- Self test (-gear-auto): the mod loaded, the overlay serves ReBorn's data, ability values read back as ReBorn's.
 ---------------------------------------------------------------------------------------------------------------
 if not gear.auto then return end
@@ -357,6 +492,22 @@ gear.task(function()
     gear.off(damage_test)
     gear.off(effect_test)
     effect_handler = gear.on('effect.add', effect_add)
+
+    -- the Changes screen: open it and take pictures of the first section and a later one
+    if gear.config.changes_shot then
+        gear.ui.show_panel('changes', true)
+        gear.wait(1.5)
+        A.screenshot('reborn-changes-1')
+        local data = load_changes()
+        view.section, view.scroll = data and #data.sections or 1, 0
+        gear.wait(1)
+        A.screenshot('reborn-changes-2')
+        view.section, view.scroll = 8, 12
+        gear.wait(1)
+        A.screenshot('reborn-changes-3')
+        print(('changes screen: %d sections, version %s, %d lines in the last built section'):format(data and #data.sections or 0, reborn_version(), #view.lines))
+        gear.ui.show_panel('changes', false)
+    end
 
     -- pointed test of the skill slot keys: which way of typing a digit reaches the slot hook (informational)
     if gear.config.slotkeys then
