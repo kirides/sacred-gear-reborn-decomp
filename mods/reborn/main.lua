@@ -341,10 +341,19 @@ gear.task(function()
     end
 
     -- the overlay: the rule exists, resolves into this mod, and the game opened ReBorn's balance.bin through it
+    -- build every patched file now (resolving a path makes Gear patch it), so a test can compare them all with ReBorn's own files
+    do
+        local built = 0
+        for line in (gear.read('overlay.txt') or ''):gmatch('([^' .. string.char(13, 10) .. ']+)') do
+            local game = line:match('^%s*([^#=]-)%s*=%s*patch:')
+            if game then gear.files.resolve(game); built = built + 1 end
+        end
+        print(('patched files requested: %d'):format(built))
+    end
     local info = gear.files.overlay()
     check('overlay rules', info and info.files > 0, info and info.files)
     local path = gear.files.resolve('bin/balance.bin')
-    check('balance.bin resolves into the mod', path:lower():gsub('\\', '/'):find('mods/reborn/data', 1, true) ~= nil, path)
+    check('balance.bin resolves into the mod', path:lower():gsub('\\', '/'):find('mods/reborn/cache/bin/balance.bin', 1, true) ~= nil, path)
     local served = gear.files.served('bin/balance.bin')
     check('the game read balance.bin from the mod', served > 0, served)
 

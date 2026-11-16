@@ -19,3 +19,12 @@ The mod re-creates **Sacred ReBorn HD 4.6** (the version of `SacredReborn.exe` i
 button that opens a window with what ReBorn changes, section by section (`changes.json`). Make that file from the group's changelist documents with
 `python tools/changelog_from_docx.py --total <TOTAL changelist.docx> --versions <changelist by versions.docx> --out mods/reborn/changes.json`; the
 version shown is the last version of the "by versions" document. The mod's description in `mod.lua` names the version too: update both after a new release.
+
+## Data: delta patches against the game's own files
+
+The mod does not ship ReBorn's data files whole. `patches/*.lua` are Lua data files with only the bytes that differ from the game's shipped file
+(`bin/balance.bin`, `bin/sets.bin`, the script code of every hero type and campaign, the default positions), and `overlay.txt` has a `patch:` rule per
+file: Gear applies the patch the first time the game opens the file, keeps the result in `cache/` and checks the size and crc32 of the original. They
+are made mechanically: `tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy` writes ReBorn's full files, then
+`tools/make_patches.py --full out-test/fullmod --gog <game folder> --out mods/reborn` compares them with the game's files. Still full files in
+`data/`: the language texts (`scripts/<lang>/SRglbl.res`) and three `DefPos.bin` whose size differs from the game's (a raw memory dump).
