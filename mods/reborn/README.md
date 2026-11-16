@@ -24,8 +24,8 @@ version shown is the last version of the "by versions" document. The mod's descr
 
 The mod does not ship ReBorn's data files whole. `patches/*.lua` are Lua data files with only what differs from the game's shipped file, and `overlay.txt`
 has a `patch:` rule per file: Gear applies the patch the first time the game opens the file, keeps the result in `cache/` and checks the size and crc32 of the
-original. Kinds of patch: byte runs (`ops`, with insertions and deletions where the size differs: `balance`, `sets`, `scripts/<hero type or campaign>`, `defpos/...`)
-and text tables (`kind = 'texts'`: the new and changed texts by text id, readable: `patches/texts/us.lua`, `de.lua`). Only the languages the game ships (`de`, `us`)
+original. Kinds of patch: tables of 32 bit words (`kind = 'words'`: `balance`, `sets`; the changed words as numbers, floats as `{f = x}`), byte runs (`ops`, with
+insertions and deletions where the size differs: `scripts/<hero type or campaign>`, `defpos/...`) and text tables (`kind = 'texts'`: the new and changed texts by text id, readable: `patches/texts/us.lua`, `de.lua`). Only the languages the game ships (`de`, `us`)
 have a patch: the other eight of ReBorn have no file in the game to compare with and are dropped.
 
 They are made mechanically: `tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy` writes ReBorn's full files, then
