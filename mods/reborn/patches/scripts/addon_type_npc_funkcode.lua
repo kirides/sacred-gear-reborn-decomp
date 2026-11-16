@@ -5,8 +5,8 @@ return {
     kind = 'script',
     file = 'funk',
     edits = {
-        -- was: type 0x1201; symbolic position "cpos:hero"; tag 0x61; now: type 0x1201; tag 0x00; tag 0xFE ...
-        {fn = 'fillchest_chestQJ_03', op = OPCODE.CREATE_OBJ, ins = 2, at = 9, old = '3c', new = '00'},
+        -- was: SET_TYPE 0x1201; FLY_TO "cpos:hero"; QUEST_ITEM; now: SET_TYPE 0x1201; NIX; tag 0xFE, ...
+        {fn = 'fillchest_chestQJ_03', op = OPCODE.CREATE_OBJ, ins = 2, at = 9, old = TAG.FLY_TO, new = TAG.NIX},
         -- Sector16079Enter: sector (16, 79): 10 creatures per 4096
         {fn = 'Sector16079Enter', op = OPCODE.FILL_SECTOR, sector = {16, 79},
          spawn = {

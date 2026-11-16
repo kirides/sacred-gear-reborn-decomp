@@ -83,10 +83,38 @@ a patch, so the patch files stay plain Lua data. `meta/constants.lua` holds LuaL
   `set_identifier` of sets 1..65 is 0 (the game's file has a counter 0x9821F1CE + n there; the item code at 0x42C3E0 reads the item ids and the count
   byte only).
 * `balance.bin`: a count word (the byte size of the global block), then the global block, which the game copies to memory at 0xAD4490 (0x711F64, **[ref]**).
-  Words 361..424 (block +0x5A0): the starting items of the heroes, 8 rows (Seraphim, Gladiator, Battle Mage, Dark Elf, Wood Elf, Vampiress, Dwarf, Daemon)
-  of 8 slots (`slot_1`..`slot_8`): the game gives three lesser healing potions and a torch; ReBorn six potions, a torch and the class's combat art item.
-  The six floats at 0xAD4BA0 (block +0x710) are factors by difficulty (0x56AA10). The other words ReBorn changes (block +0x744 and later, the 2000s after
-  the global block) are listed in `patches/balance.lua` with their position and "not named yet": the structure is not known.
+  Every word ReBorn changes is named in `patches/balance.lua` (`ops` is empty):
+  * words 361..424 (block +0x5A0): the starting items of the heroes, 8 records (`HERO.SERAPHIM` .. `HERO.DAEMON`) of 8 slots: the game gives three lesser
+    healing potions and a torch, ReBorn six potions, a torch and the class's combat art item;
+  * words 453..482: five tables of six floats, one per **difficulty index** (0x56AA10 and others map the difficulty variable 1..4 to 0..3 and every other
+    value to 5; index 4 is never selected; bronze, silver, gold, platinum, unused_4, niobium; `constants/difficulty.lua`). Their readers (found by scanning
+    `Sacred.exe` for the addresses): 0xAD4BA0 **rating factor**: attack value / defence value of creatures above level 16 (0x56AA10, 0x56AA90, called with the
+    "HP .. AW .. VW .. DP .. DF" debug string of 0x627180) and a value of the damage calculation 0x56B130; 0xAD4BB8 **hit point factor** (0x5658F0 computes
+    a creature's hit points through a level band table at 0xAD4778 and this factor; the decompiler drops the x87 reads, so this one is read from the
+    disassembly); 0xAD4BD0 and 0xAD4BE8 **damage factors** (0x56B130: four damage values each, one for a creature of level 17+ hitting one below 17, the
+    other the other way round); 0xAD4C00 **experience factor** (0x57D860, one `switch` over the difficulty). A sixth table (0xAD4C18, integers 0, 35, 70, 128)
+    is the level a difficulty adds (0x47C610 and others); ReBorn leaves it. That index 5 is Niobium is inferred (the game maps difficulty 5 and 0 to it);
+  * words 622..626 (0xAD4E44): the multiplayer level limits: the UI (0x707220, 0x707540) shows Silver from `silver_min_level` to `platinum_min_level`, Gold
+    from `gold_min_level` to `niobium_min_level`, Platinum from `platinum_min_level` to `platinum_max_level`, Niobium from `niobium_min_level`, Bronze up to
+    `gold_min_level` (ReBorn: Silver from level 1 instead of 20);
+  * words 5598..: nine region records of 16 words (`REGION.NORTHKERN` .. `REGION.REGION_9`): a counter (twice), the region number and `UI_REGION_<NAME>`
+    (char[32]). ReBorn sets both counters to 2000 in every region, which its changelist calls "the counter of region bosses"; the code that reads this table was
+    not traced, so the field names `boss_counter` and `boss_counter_copy` come from the changelist and the two equal values in the game's file.
+
+## Script operand tags (the CreateObj edits)
+
+A `CreateObj` instruction (opcode 8) is a list of tagged operands. The tag names come from the Armalion editor vocabulary as listed by **[ref]** (they are
+not strings of `Sacred.exe`; the payload shapes were checked against the files): `NIX` 0x00, `SET_NAME` 0x01 (string), `SET_TYPE` 0x02 (type id),
+`SET_WPOS` 0x20 (three int32), `FLY_TO` 0x3C (a position; X = -2 means a symbolic one: a string such as `cpos:hero`), `QUEST_ITEM` 0x61. ReBorn's two edits:
+the object `fillchest_chestQJ_03` loses its `FLY_TO "cpos:hero"` (the tag becomes `NIX`), and in `Sector22052Init` two tag bytes 0x9E (a tag that is in no list)
+come in front of `SET_WPOS`, which moves the instruction's last two bytes out; both are kept as the bytes ReBorn has, with a comment.
+
+## What has no name, and why
+
+* `unused_4` of the difficulty tables: the index the game never selects (ReBorn edits it anyway).
+* `word_1`, `word_4`..`word_7` of a region record, `word_12`..`word_27` of a set record: leftover memory or unknown, not changed by ReBorn.
+* Sets have no names: the set records name their items and an index only; the set's display name is not in `sets.bin` (not traced).
+* The 0x9E bytes of the second `CreateObj` edit: no tag of that value is known.
 
 ## Checks
 

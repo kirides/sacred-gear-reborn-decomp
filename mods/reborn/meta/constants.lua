@@ -855,3 +855,52 @@ ITEM = nil
 
 ---@type OpcodeConstants
 OPCODE = nil
+
+---@class HeroConstants
+---@field SERAPHIM integer 0
+---@field GLADIATOR integer 1
+---@field BATTLE_MAGE integer 2
+---@field DARK_ELF integer 3
+---@field WOOD_ELF integer 4
+---@field VAMPIRESS integer 5
+---@field DWARF integer 6
+---@field DAEMON integer 7
+
+---@type HeroConstants
+HERO = nil
+
+---@class DifficultyConstants
+---@field BRONZE integer 0
+---@field SILVER integer 1
+---@field GOLD integer 2
+---@field PLATINUM integer 3
+---@field UNUSED_4 integer 4
+---@field NIOBIUM integer 5
+
+---@type DifficultyConstants
+DIFFICULTY = nil
+
+---@class RegionConstants
+---@field NORTHKERN integer 0
+---@field SUMPF integer 1
+---@field WUSTE integer 2
+---@field NORD integer 3
+---@field LAVA integer 4
+---@field SHADDARNUR integer 5
+---@field UW_UPPER integer 6
+---@field UW_LOWER integer 7
+---@field REGION_9 integer 8
+
+---@type RegionConstants
+REGION = nil
+
+---@class TagConstants
+---@field NIX integer 0
+---@field SET_NAME integer 1
+---@field SET_TYPE integer 2
+---@field SET_WPOS integer 32
+---@field FLY_TO integer 60
+---@field QUEST_ITEM integer 97
+
+---@type TagConstants
+TAG = nil
