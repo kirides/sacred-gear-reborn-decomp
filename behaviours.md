@@ -160,9 +160,10 @@ engine's window event handler (ENG `0x6172C0`, found by a window 0x30 bytes insi
 `gear.game.cursor_click(false)` sends the button up class (`0x899248`) instead. `mods/reborn` clicks when `SR_QUICK_CAST` is `1`.
 **Verified in real play (pointed run, `-SlotKeys`):** the five slot sites fire on a digit key whether it is typed as a character, pressed or held,
 **but only with `COMBINE_SLOTS : 1` in `Settings.cfg`**: the handler asks the setting (ENG `0x81CF80`, string `COMBINE_SLOTS`) before it selects a slot;
-with 0 the keys never reach the sites. **Not verified:** that the injected event makes the game act: with no skill chosen a direct `cursor_click()`
-did not walk the hero (event position equals the mouse's, `597,341`), so either the world mouse handler needs more than the event (SacredBild's
-hook remaps its position, the button state of `cMouse` ...) or a click needs a chosen skill. Still to find out with a hero that has a skill selected.
+with 0 the keys never reach the sites. **Quick cast verified (pointed run, control pass first, hero L9 dark elf of save 0, three skeletons near the cursor):** the slot keys alone trigger no engine
+hook; with `quick_cast` on, slot 3 + the injected button down at the cursor makes the engine run `effect.add` (a spell was cast), the other slots do nothing
+(empty or not castable there). A direct `cursor_click()` with no skill chosen does not walk the hero (the event is a cast trigger, not a walk). The hero's
+position did not change in either pass.
 ReBorn's other change in that handler (a cave at `0x1ACC770` that routes the keys `1`..`7` to the slot actions) is not re-created. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
 
 ## B9 Hooks into appended code (43 hooks)

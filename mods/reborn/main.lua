@@ -363,6 +363,33 @@ gear.task(function()
             gear.wait(2)
             print(('hero after the click at %s'):format(where()))
         end
+        -- enemies under the cursor, then every slot key: do the hit sites run (the hero cast something)?
+        do
+            local x, y, layer = hero:position()
+            for i = 1, 3 do gear.world.spawn(32, x + 90 * i, y + 60, {layer = layer}) end
+            gear.wait(2)
+            local function snapshot()
+                local t = {}
+                for _, site in ipairs(gear.hooks.sites()) do
+                    if site.hook ~= 'skillslot.select' then t[site.hook .. '[' .. site.index .. ']'] = site.calls end
+                end
+                return t
+            end
+            local function diff(a, b)
+                local out = {}
+                for k, v in pairs(b) do if v ~= (a[k] or 0) then out[#out + 1] = ('%s +%d'):format(k, v - (a[k] or 0)) end end
+                return table.concat(out, ', ')
+            end
+            for _, quick in ipairs({false, true}) do        -- the first pass is the control: the keys without the click
+                gear.config.quick_cast = quick
+                for key = 1, 5 do
+                    local h0, p0 = snapshot(), where()
+                    A.type(tostring(key))
+                    gear.wait(1.5)
+                    print(('slot key %d, quick cast %s: [%s] hero %s -> %s, hp %s'):format(key, tostring(quick), diff(h0, snapshot()), p0, where(), tostring(hero:hp())))
+                end
+            end
+        end
         for _, way in ipairs({'type', 'press', 'key_down_up'}) do
             for key = 1, 5 do
                 local before = calls()
