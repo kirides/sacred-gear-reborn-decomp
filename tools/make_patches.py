@@ -1,35 +1,41 @@
 #!/usr/bin/env python3
 """Turns the full data files of a generated ReBorn mod into delta patches against the game's own files.
 
-  python tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy        (the full data files, as before)
+  python tools/reborn_port.py ... --mod out-test/fullmod --data bin --copy        (the full data files)
   python tools/make_patches.py --full out-test/fullmod --gog "<game folder>" --out mods/reborn
 
-For every rule `game path = data file` of the full mod's overlay.txt whose game file exists in --gog and has the same size, a Lua data file
-`patches/...lua` with only the bytes that differ is written, and the rule becomes `game path = patch:patches/...lua` (Gear applies the patch to the
-game's file the first time the game opens it and serves the result; see gear/overlay.cpp). Rules whose file cannot be a same-size patch (other
-size or no game file to compare with) keep their data file for now and are listed at the end.
+For every rule `game path = data file` of the full mod's overlay.txt whose game file exists in --gog, a Lua data file `patches/...lua` with only
+what differs is written and the rule becomes `game path = patch:patches/...lua`: Gear applies the patch to the game's file the first time the
+game opens it and serves the result (gear/overlay.cpp). Files of the same size are compared byte by byte (runs of changed bytes); files of
+another size by matching stretches (insertions, deletions, replacements). Rules for a game file that does not exist in --gog are dropped (the
+game never opens it, and there is nothing to be a baseline); other rules keep their data file and are listed at the end. Every patch is applied
+again in memory and compared with the full file before it is written.
 
 Patch file format (pure Lua data):
   return {
-    target = 'bin/balance.bin',    -- the game file the patch is for
-    size = 24328, crc32 = 0x...,   -- of that file: a patch is only applied to exactly this file
-    ops = { {offset, 'hex'}, ... } -- the replacement bytes at an offset of the original, ascending
+    target = 'bin/balance.bin',      -- the game file the patch is for
+    size = 24328, crc32 = 0x...,     -- of that file: a patch is only applied to exactly this file
+    ops = { {offset, 'hex'}, {offset, 'hex', replaced}, ... }
+        -- ascending offsets in the original: the hex bytes replace `replaced` bytes there (default: as many as the hex has)
   }
 """
 import argparse
+import bisect
 import os
 import re
 import shutil
 import sys
 import zlib
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import restext
+
 
 def read_rules(path):
     rules = []
     saves = None
     for line in open(path, encoding='utf8'):
-        raw = line.rstrip('\n')
-        body = raw.split('#', 1)[0].strip()
+        body = line.rstrip('\n').split('#', 1)[0].strip()
         if not body or '=' not in body:
             continue
         key, value = [x.strip() for x in body.split('=', 1)]
@@ -40,41 +46,108 @@ def read_rules(path):
     return rules, saves
 
 
-def diff_runs(a, b):
-    """[(offset, bytes of a)] where a (the changed file) differs from b (the game's), equal length."""
-    out, i, n = [], 0, len(a)
+def diff_runs(new, old):
+    """[(offset, new bytes)] where `new` differs from `old`, equal length."""
+    out, i, n = [], 0, len(new)
     while i < n:
-        if a[i] != b[i]:
+        if new[i] != old[i]:
             j = i
-            while j < n and a[j] != b[j]:
+            while j < n and new[j] != old[j]:
                 j += 1
-            out.append((i, a[i:j]))
+            out.append((i, new[i:j]))
             i = j
         else:
             i += 1
     return out
 
 
+def delta_ops(new, old, k=24, step=8):
+    """[(offset in old, replacement bytes, replaced length)], ascending, turning `old` into `new` when the sizes differ: stretches of k or more
+    equal bytes are found with an index of `old` taken every `step` bytes; what lies between them is replaced."""
+    index = {}
+    for i in range(0, len(old) - k + 1, step):
+        index.setdefault(old[i:i + k], []).append(i)
+    ops, j, cur, start = [], 0, 0, 0
+    n = len(new)
+    while j <= n - k:
+        cand = index.get(new[j:j + k])
+        p = None
+        if cand:
+            at = bisect.bisect_left(cand, cur)
+            if at < len(cand):
+                p = cand[at]
+        if p is None:
+            j += 1
+            continue
+        a, b = j, p                                  # extend the match backwards ...
+        while a > start and b > cur and new[a - 1] == old[b - 1]:
+            a -= 1
+            b -= 1
+        e, f = j + k, p + k                          # ... and forwards
+        while e < n and f < len(old) and new[e] == old[f]:
+            e += 1
+            f += 1
+        if a > start or b > cur:
+            ops.append((cur, new[start:a], b - cur))
+        cur, start, j = f, e, e
+    if start < n or cur < len(old):
+        ops.append((cur, new[start:], len(old) - cur))
+    return ops
+
+
+def apply_ops(old, ops):
+    out, at = bytearray(), 0
+    for item in ops:
+        off, data = item[0], item[1]
+        replaced = item[2] if len(item) > 2 else len(data)
+        assert off >= at
+        out += old[at:off]
+        out += data
+        at = off + replaced
+    out += old[at:]
+    return bytes(out)
+
+
 def lua_patch(target, original, ops, note):
     lines = ['-- %s' % note,
-             '-- Generated by tools/make_patches.py: only the bytes that differ from the game\'s own file; Gear applies it when the game opens the file.',
+             "-- Generated by tools/make_patches.py: only what differs from the game's own file; Gear applies it when the game opens the file.",
              'return {',
              "    target = '%s'," % target.replace('\\', '/'),
              '    size = %d,' % len(original),
              '    crc32 = 0x%08x,' % (zlib.crc32(original) & 0xFFFFFFFF),
              '    ops = {']
-    for off, data in ops:
-        lines.append("        {%d, '%s'}," % (off, data.hex()))
+    for item in ops:
+        off, data = item[0], item[1]
+        if len(item) > 2 and item[2] != len(data):
+            lines.append("        {%d, '%s', %d}," % (off, data.hex(), item[2]))
+        else:
+            lines.append("        {%d, '%s'}," % (off, data.hex()))
     lines += ['    },', '}', '']
     return '\n'.join(lines)
 
 
+def lua_text_patch(target, original, set_, remove, note):
+    old_flags = {i: v[0] for i, v in restext.parse(original).items()}
+    lines = ['-- %s' % note,
+             "-- Generated by tools/make_patches.py: the texts that are new or differ from the game's own table, by text id.",
+             'return {',
+             "    kind = 'texts',",
+             "    target = '%s'," % target.replace(chr(92), '/'),
+             '    size = %d,' % len(original),
+             '    crc32 = 0x%08x,' % (zlib.crc32(original) & 0xFFFFFFFF)]
+    lines += restext.lua_table(set_, remove, old_flags)
+    lines += ['}', '']
+    return '\n'.join(lines)
+
+
+BS = chr(92)
 USE_CASES = [
-    (re.compile(r'^bin\\balance\.bin$'), 'balance', 'Balance tables (balance.bin).'),
-    (re.compile(r'^bin\\sets\.bin$'), 'sets', 'Item sets (sets.bin).'),
-    (re.compile(r'^bin\\(.+)\\startcode\.bin$'), 'scripts', 'Script start code of %s (StartCode.bin).'),
-    (re.compile(r'^bin\\(.+)\\funkcode\.bin$'), 'scripts', 'Script function code of %s (FunkCode.bin).'),
-    (re.compile(r'^bin\\(.+)\\defpos\.bin$'), 'defpos', 'Default positions of %s (DefPos.bin).'),
+    (re.compile('^bin' + re.escape(BS) + 'balance[.]bin$'), 'balance', 'Balance tables (balance.bin).'),
+    (re.compile('^bin' + re.escape(BS) + 'sets[.]bin$'), 'sets', 'Item sets (sets.bin).'),
+    (re.compile('^bin' + re.escape(BS) + '(.+)' + re.escape(BS) + 'startcode[.]bin$'), 'scripts', 'Script start code of %s (StartCode.bin).'),
+    (re.compile('^bin' + re.escape(BS) + '(.+)' + re.escape(BS) + 'funkcode[.]bin$'), 'scripts', 'Script function code of %s (FunkCode.bin).'),
+    (re.compile('^bin' + re.escape(BS) + '(.+)' + re.escape(BS) + 'defpos[.]bin$'), 'defpos', 'Default positions of %s (DefPos.bin).'),
+    (re.compile('^scripts' + re.escape(BS) + '(.+)' + re.escape(BS) + 'global[.]res$'), 'texts', 'Texts of the language %s (global.res).'),
 ]
 
 
@@ -82,12 +155,15 @@ def patch_path(game):
     g = game.lower()
     for rx, folder, note in USE_CASES:
         m = rx.match(g)
-        if m:
-            if folder in ('balance', 'sets'):
-                return 'patches/%s.lua' % folder, note
-            variant = m.group(1).replace('\\', '_')
-            kind = os.path.basename(g.replace('\\', '/')).replace('.bin', '')
-            return 'patches/%s/%s/%s.lua' % (folder, variant, kind), note % m.group(1).replace('\\', '/')
+        if not m:
+            continue
+        if folder in ('balance', 'sets'):
+            return 'patches/%s.lua' % folder, note
+        if folder == 'texts':
+            return 'patches/texts/%s.lua' % m.group(1), note % m.group(1)
+        variant = m.group(1).replace(BS, '_')
+        kind = os.path.basename(g.replace(BS, '/')).replace('.bin', '')
+        return 'patches/%s/%s/%s.lua' % (folder, variant, kind), note % m.group(1).replace(BS, '/')
     return None, None
 
 
@@ -96,56 +172,69 @@ def main():
     ap.add_argument('--full', required=True, help='the generated mod folder with the full data files (overlay.txt, data/)')
     ap.add_argument('--gog', required=True, help="the game folder whose files are the baseline")
     ap.add_argument('--out', required=True, help='mods/reborn')
-    ap.add_argument('--keep', action='store_true', help='also copy the data files that stay full files')
     a = ap.parse_args()
     rules, saves = read_rules(os.path.join(a.full, 'overlay.txt'))
-    out_rules, kept, converted, saved = [], [], 0, 0
-    total_ops = 0
+    out_rules, kept, dropped = [], [], []
+    converted = runs = replaced_bytes = patch_bytes = 0
+    shutil.rmtree(os.path.join(a.out, 'patches'), ignore_errors=True)
     os.makedirs(os.path.join(a.out, 'patches'), exist_ok=True)
     for game, value in rules:
-        src = os.path.join(a.full, value.replace('\\', os.sep))
-        base = os.path.join(a.gog, game.replace('\\', os.sep))
+        src = os.path.join(a.full, value.replace(BS, os.sep))
+        base = os.path.join(a.gog, game.replace(BS, os.sep))
         rel_patch, note = patch_path(game)
-        if rel_patch and os.path.exists(src) and os.path.exists(base):
+        if rel_patch and os.path.exists(src):
+            if not os.path.exists(base):
+                dropped.append(game)
+                continue
             mine = open(src, 'rb').read()
             orig = open(base, 'rb').read()
-            if len(mine) == len(orig):
-                ops = diff_runs(mine, orig)
-                if not ops:
-                    continue                      # identical to the game's file: no rule at all
-                dest = os.path.join(a.out, rel_patch.replace('/', os.sep))
-                os.makedirs(os.path.dirname(dest), exist_ok=True)
-                with open(dest, 'w', newline='\n') as f:
-                    f.write(lua_patch(game, orig, ops, note))
-                out_rules.append((game, 'patch:' + rel_patch.replace('/', '\\')))
-                converted += 1
-                total_ops += len(ops)
-                saved += len(mine)
-                continue
+            if rel_patch.startswith('patches/texts/'):
+                # a text table: the texts that are new or differ, by id (readable), not byte runs
+                set_, remove = restext.delta(mine, orig)
+                assert restext.apply(orig, set_, remove) == mine, 'the text patch for %s does not rebuild the file' % game
+                ops = [None] * (len(set_) + len(remove))
+                text = lua_text_patch(game, orig, set_, remove, note)
+            else:
+                ops = diff_runs(mine, orig) if len(mine) == len(orig) else delta_ops(mine, orig)
+                assert apply_ops(orig, ops) == mine, 'the patch for %s does not rebuild the file' % game
+                text = None
+            if not ops:
+                continue                              # identical to the game's file: no rule at all
+            dest = os.path.join(a.out, rel_patch.replace('/', os.sep))
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            if text is None:
+                text = lua_patch(game, orig, ops, note)
+            with open(dest, 'w', encoding='utf8', newline='\n') as f:
+                f.write(text)
+            out_rules.append((game, 'patch:' + rel_patch.replace('/', BS)))
+            converted += 1
+            runs += len(ops)
+            replaced_bytes += len(mine)
+            patch_bytes += len(text)
+            continue
         out_rules.append((game, value))
         kept.append((game, value))
-    # the rules file
     with open(os.path.join(a.out, 'overlay.txt'), 'w', newline='\n') as f:
         f.write('# Generated by tools/make_patches.py (after tools/reborn_port.py): the game path = a delta patch or a data file.\n')
-        f.write('# Sacred ReBorn by the Sacred ReBorn Overlookers group. `patch:` rules apply a Lua patch to the game\'s own file (gear/overlay.cpp).\n')
+        f.write("# Sacred ReBorn by the Sacred ReBorn Overlookers group. `patch:` rules apply a Lua patch to the game's own file (gear/overlay.cpp).\n")
         if saves:
             f.write('saves = %s    # ReBorn games live in the mod folder; the original game saves stay untouched\n' % saves)
         for game, value in out_rules:
             f.write('%s = %s\n' % (game, value))
-    # the data files that stay
     data_root = os.path.join(a.out, 'data')
-    if os.path.isdir(data_root):
-        shutil.rmtree(data_root)
+    shutil.rmtree(data_root, ignore_errors=True)
     for game, value in kept:
-        src = os.path.join(a.full, value.replace('\\', os.sep))
+        src = os.path.join(a.full, value.replace(BS, os.sep))
         if os.path.exists(src):
-            dest = os.path.join(a.out, value.replace('\\', os.sep))
+            dest = os.path.join(a.out, value.replace(BS, os.sep))
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             shutil.copyfile(src, dest)
-    print('%d rules converted to patches (%d changed runs, %d bytes of data replaced by patches), %d rules keep their data file' % (
-        converted, total_ops, saved, len(kept)))
+    print('%d rules are patches (%d ops; %d bytes of full files -> %d bytes of Lua), %d rules keep a data file, %d dropped' % (
+        converted, runs, replaced_bytes, patch_bytes, len(kept), len(dropped)))
     for game, value in kept:
         print('  kept: %s = %s' % (game, value))
+    for game in dropped:
+        print('  dropped (the game has no such file): %s' % game)
 
 
 if __name__ == '__main__':
