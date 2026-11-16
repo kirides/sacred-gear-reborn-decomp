@@ -164,7 +164,10 @@ with 0 the keys never reach the sites. **Quick cast verified (pointed run, contr
 hook; with `quick_cast` on, slot 3 + the injected button down at the cursor makes the engine run `effect.add` (a spell was cast), the other slots do nothing
 (empty or not castable there). A direct `cursor_click()` with no skill chosen does not walk the hero (the event is a cast trigger, not a walk). The hero's
 position did not change in either pass.
-ReBorn's other change in that handler (a cave at `0x1ACC770` that routes the keys `1`..`7` to the slot actions) is not re-created. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
+ReBorn's other change in that handler, the cave at DE `0x1ACC770` (ENG `0x6E2197`, the `jb` after `cmp ax, 0x30`), routes the digits itself: `1`..`5` to the whole case
+of slots 1..5 (page choice, `COMBINE_SLOTS` check, selection), `6`, `7`, `8`, `9`, `0` to the selection half of the same slots, i.e. **without** the
+`COMBINE_SLOTS` check. Re-created as the event `skillslot.key(character) -> slot | {slot, 'select'} | false | nil` (a site hook that jumps into the handler's case blocks);
+`mods/reborn` answers it. Verified in a pointed run with `COMBINE_SLOTS : 0`: key `6` reaches the slot hook (1 call), key `1` does not. RESISTANCE_GLOW and UPSCALING are rendering: Bild.
 
 ## B9 Hooks into appended code (43 hooks)
 

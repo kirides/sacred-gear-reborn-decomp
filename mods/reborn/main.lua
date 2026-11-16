@@ -150,6 +150,15 @@ gear.on('combat.branch', function(name, vanilla, index, eax)
     if name == 'color.clamp' then return true end
 end)
 
+-- skillslot.key (B8, the cave at DE 01ACC770): ReBorn routes the digit keys itself. '1'..'5' choose the slots 1..5 as the engine does (page choice,
+-- COMBINE_SLOTS check, selection); '6', '7', '8', '9', '0' choose the same slots 1..5 by the selection alone, without the COMBINE_SLOTS check.
+local SLOT_KEYS = {[0x31] = 0, [0x32] = 1, [0x33] = 2, [0x34] = 3, [0x35] = 4,
+                   [0x36] = {0, 'select'}, [0x37] = {1, 'select'}, [0x38] = {2, 'select'}, [0x39] = {3, 'select'}, [0x30] = {4, 'select'}}
+gear.on('skillslot.key', function(character)
+    local k = SLOT_KEYS[character]
+    if k then return k end
+end)
+
 gear.on('load', apply_abilities)
 gear.on('frame', function()
     if not applied.ok then apply_abilities() end
@@ -355,6 +364,13 @@ gear.task(function()
         A.move(900, 400)
         gear.wait(1)
         local function calls() return gear.hooks.stats('skillslot.select').calls end
+        -- keys 6 and 1: the routing (select half vs the whole case with the COMBINE_SLOTS check)
+        for _, k in ipairs({'6', '1'}) do
+            local before = calls()
+            A.type(k)
+            gear.wait(0.6)
+            print(('routing key %s: %d new slot hook calls'):format(k, calls() - before))
+        end
         local hero = gear.world.hero()
         local function where() local x, y = hero:position(); return ('%.0f,%.0f'):format(x or 0, y or 0) end
         print('hero before the slot keys at ' .. where())
