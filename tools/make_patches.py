@@ -269,56 +269,94 @@ def lua_set_patch(target, original, edits, note):
     return chr(10).join(lines)
 
 
-START_WORD, START_ROWS = 361, 8        # balance.bin: the starting items of the heroes: 8 rows (one per hero class) of 8 words from word 361
-START_HEROES = ['Seraphim', 'Gladiator', 'Battle Mage', 'Dark Elf', 'Wood Elf', 'Vampiress', 'Dwarf', 'Daemon']
+DIFF_FIELDS = ['bronze', 'silver', 'gold', 'platinum', 'unused_4', 'niobium']      # difficulty index 0..5 (constants/difficulty.lua)
+# balance.bin: named tables inside the global block and after it. first = word index of record 0, rows = records, kind: how a value is written.
+# Evidence for each (Sacred.exe): see docs/file-formats.md.
+BALANCE_SECTIONS = [
+    {'title': 'starting items of a hero class, one record per class (the game: three potions and a torch)', 'first': 361, 'words': 8, 'rows': 8,
+     'fields': ['slot_%d' % i for i in range(1, 9)], 'key': 'HERO', 'kind': 'item'},
+    {'title': 'rating factor by difficulty: multiplies the attack and defence value of creatures above level 16 (0x56AA10, 0x56AA90) and a value of the damage '
+              'calculation (0x56B130)',
+     'first': 453, 'words': 6, 'rows': 1, 'fields': DIFF_FIELDS, 'kind': 'float'},
+    {'title': 'hit point factor by difficulty (0x5658F0: the hit points of a creature)', 'first': 459, 'words': 6, 'rows': 1, 'fields': DIFF_FIELDS,
+     'kind': 'float'},
+    {'title': 'damage factor by difficulty, a creature of level 17 or more hitting one below 17 (0x56B130: four damage values)', 'first': 465, 'words': 6,
+     'rows': 1, 'fields': DIFF_FIELDS, 'kind': 'float'},
+    {'title': 'damage factor by difficulty, a creature below level 17 hitting one of level 17 or more (0x56B130: four damage values)', 'first': 471, 'words': 6,
+     'rows': 1, 'fields': DIFF_FIELDS, 'kind': 'float'},
+    {'title': 'experience factor by difficulty (0x57D860)', 'first': 477, 'words': 6, 'rows': 1, 'fields': DIFF_FIELDS, 'kind': 'float'},
+    {'title': 'multiplayer level limits of the difficulties (0x707220 and 0x707540: Silver from silver_min_level to platinum_min_level, Gold from gold_min_level '
+              'to niobium_min_level, Platinum from platinum_min_level to platinum_max_level, Niobium from niobium_min_level, Bronze up to gold_min_level)',
+     'first': 622, 'words': 5, 'rows': 1, 'kind': 'int',
+     'fields': ['silver_min_level', 'gold_min_level', 'platinum_min_level', 'niobium_min_level', 'platinum_max_level']},
+    {'title': 'regions: the counter of the region bosses (ReBorn changelist: "The counter of region bosses reduced to 2000 for each region"), the region '
+              'number and its name',
+     'first': 5598, 'words': 16, 'rows': 9, 'key': 'REGION', 'kind': 'int',
+     'fields': ['boss_counter', 'word_1', 'boss_counter_copy', 'region_number', 'word_4', 'word_5', 'word_6', 'word_7', 'name_1', 'name_2', 'name_3',
+                'name_4', 'name_5', 'name_6', 'name_7', 'name_8']},
+]
 
 
 def balance_split(original, mine):
-    """(start item edits [(row, slot, value)], the other changed word runs): the starting items are named, the rest stays word runs."""
+    """({section index: {row: {field: word}}}, the other changed word runs): named tables as record edits, the rest stays word runs."""
     import struct
-    start = []
+    edits = {}
     rest = bytearray(mine)
-    for w in range(START_WORD, START_WORD + 8 * START_ROWS):
-        new, old = struct.unpack_from('<I', mine, w * 4)[0], struct.unpack_from('<I', original, w * 4)[0]
-        if new != old:
-            start.append(((w - START_WORD) // 8, (w - START_WORD) % 8, new))
-        struct.pack_into('<I', rest, w * 4, old)
-    return start, word_runs(bytes(rest), original)
+    for si, sec in enumerate(BALANCE_SECTIONS):
+        for row in range(sec['rows']):
+            for k, field in enumerate(sec['fields']):
+                w = sec['first'] + row * sec['words'] + k
+                new, old = struct.unpack_from('<I', mine, w * 4)[0], struct.unpack_from('<I', original, w * 4)[0]
+                if new != old:
+                    edits.setdefault(si, {}).setdefault(row, {})[field] = new
+                    struct.pack_into('<I', rest, w * 4, old)
+    return edits, word_runs(bytes(rest), original)
 
 
-def apply_balance(original, start, runs):
+def apply_balance(original, edits, runs):
     import struct
     out = bytearray(apply_words(original, runs))
-    for row, slot, v in start:
-        struct.pack_into('<I', out, (START_WORD + row * 8 + slot) * 4, v)
+    for si, rows in edits.items():
+        sec = BALANCE_SECTIONS[si]
+        for row, fields in rows.items():
+            for field, v in fields.items():
+                struct.pack_into('<I', out, (sec['first'] + row * sec['words'] + sec['fields'].index(field)) * 4, v)
     return bytes(out)
 
 
-def lua_balance_patch(target, original, start, runs, note, items):
-    names = {v: k for k, v in items.items()}
-    def item(v):
-        return 'ITEM.%s' % names[v] if v in names else str(v)
+def lua_balance_patch(target, original, edits, runs, note, constants):
+    items = {v: k for k, v in constants.get('ITEM', {}).items()}
+
+    def key(sec, row):
+        names = {v: k for k, v in constants.get(sec.get('key', ''), {}).items()}
+        return '%s.%s' % (sec['key'], names[row]) if row in names else str(row)
+
+    def value(sec, v):
+        if sec['kind'] == 'float':
+            return word_literal(v)
+        return ('ITEM.%s' % items[v]) if sec['kind'] == 'item' and v in items else str(v)
     lines = ['-- %s' % note,
              "-- Generated by tools/make_patches.py: the words that differ from the game's own file. balance.bin: a count word (the size of the global block),",
              '-- then the global block, copied to memory at 0xAD4490 (Sacred.exe 0x711F64), then more tables. Word i is the bytes 4 * i .. 4 * i + 3 of the file.',
-             '-- `sections`: tables with named fields. `ops`: words that are not named yet, {first word, {values}} with where they are in memory;',
-             '-- 0xAD4BA0..0xAD4BB7 are the six difficulty factors that 0x56AA10 multiplies damage with (floats).',
+             '-- `sections`: tables with named fields (one record per hero class or region; a difficulty table has one record with a field per difficulty);',
+             '-- `ops`: words that are not named, {first word, {values}} with their place in memory.',
              'return {',
              "    kind = 'words',",
              "    target = '%s'," % target.replace(chr(92), '/'),
              '    size = %d,' % len(original),
              '    crc32 = 0x%08x,' % (zlib.crc32(original) & 0xFFFFFFFF),
-             '    sections = {',
-             '        {   -- the starting items of a hero class: 8 slots in 8 rows, one row per class (the game: three potions and a torch)',
-             '            records = {first = %d, words = 8, fields = {slot_1 = 0, slot_2 = 1, slot_3 = 2, slot_4 = 3, slot_5 = 4, slot_6 = 5, slot_7 = 6, slot_8 = 7}},' % START_WORD,
-             '            edits = {']
-    rows = {}
-    for row, slot, v in start:
-        rows.setdefault(row, []).append((slot, v))
-    for row in sorted(rows):
-        fields = ', '.join('slot_%d = %s' % (slot + 1, item(v)) for slot, v in rows[row])
-        lines.append('                {record = %d, %s},   -- %s' % (row, fields, START_HEROES[row]))
-    lines += ['            },', '        },', '    },', '    ops = {']
+             '    sections = {']
+    for si in sorted(edits):
+        sec = BALANCE_SECTIONS[si]
+        fields = ', '.join('%s = %d' % (f, k) for k, f in enumerate(sec['fields']))
+        lines += ['        {   -- %s' % sec['title'],
+                  '            records = {first = %d, words = %d, fields = {%s}},' % (sec['first'], sec['words'], fields),
+                  '            edits = {']
+        for row in sorted(edits[si]):
+            body = ', '.join('%s = %s' % (f, value(sec, v)) for f, v in edits[si][row].items())
+            lines.append('                {record = %s, %s},' % (key(sec, row), body))
+        lines += ['            },', '        },']
+    lines += ['    },', '    ops = {']
     note_for = balance_note(original)
     for first, values in runs:
         lines.append('        {%d, {%s}},   -- %s' % (first, ', '.join(word_literal(v) for v in values), note_for(first, len(values))))
@@ -437,10 +475,10 @@ def main():
                     text = lua_set_patch(game, orig, edits, note)
                     ops = edits
                 else:
-                    start, rest = balance_split(orig, mine)
-                    assert apply_balance(orig, start, rest) == mine, 'the balance patch for %s does not rebuild the file' % game
-                    text = lua_balance_patch(game, orig, start, rest, note, script_edits.load_constants(os.path.join(a.out, 'constants')).get('ITEM', {}))
-                    ops = start + rest
+                    named, rest = balance_split(orig, mine)
+                    assert apply_balance(orig, named, rest) == mine, 'the balance patch for %s does not rebuild the file' % game
+                    text = lua_balance_patch(game, orig, named, rest, note, script_edits.load_constants(os.path.join(a.out, 'constants')))
+                    ops = [None] * (sum(len(f) for r in named.values() for f in r.values()) + len(rest))
             else:
                 ops = diff_runs(mine, orig) if len(mine) == len(orig) else delta_ops(mine, orig)
                 assert apply_ops(orig, ops) == mine, 'the patch for %s does not rebuild the file' % game

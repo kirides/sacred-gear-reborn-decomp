@@ -31,6 +31,7 @@ OP_FILLSECTOR = 51
 OP_SET_VAR = 67
 OPCODES = {OP_CREATE_OBJ: 'CREATE_OBJ', OP_FILLSECTOR: 'FILL_SECTOR', OP_SET_VAR: 'SET_VAR'}
 FILLSECTOR_HEADER = 40      # bytes before the spawn table in a FillSector instruction (checked against every file)
+TAG_NAMES = {0x00: 'NIX', 0x01: 'SET_NAME', 0x02: 'SET_TYPE', 0x20: 'SET_WPOS', 0x3C: 'FLY_TO', 0x61: 'QUEST_ITEM'}
 TAG_SPAWN = 0x19
 TRIPLE = 13
 # FillSector header: 4 byte instruction header, then tagged operands (offsets in the instruction): 0x36 creature value, 0x34 sector X Y,
@@ -84,23 +85,23 @@ def describe(data, off, length):
             tag = data[p]
             if tag == 0x01:
                 z = data.index(0, p + 1)
-                parts.append('name "%s"' % data[p + 1:z].decode('latin1'))
+                parts.append('SET_NAME "%s"' % data[p + 1:z].decode('latin1'))
                 p = z + 1
             elif tag == 0x02:
-                parts.append('type 0x%X' % struct.unpack_from('<i', data, p + 1)[0])
+                parts.append('SET_TYPE 0x%X' % struct.unpack_from('<i', data, p + 1)[0])
                 p += 5
             elif tag == 0x20:
-                parts.append('world position %s' % (struct.unpack_from('<3i', data, p + 1),))
+                parts.append('SET_WPOS %s' % (struct.unpack_from('<3i', data, p + 1),))
                 p += 13
             elif tag == 0x3C and struct.unpack_from('<i', data, p + 1)[0] == -2:
                 z = data.index(0, p + 5)
-                parts.append('symbolic position "%s"' % data[p + 5:z].decode('latin1'))
+                parts.append('FLY_TO "%s"' % data[p + 5:z].decode('latin1'))
                 p = z + 1
             elif tag in (0x00, 0x61):
-                parts.append('tag 0x%02X' % tag)
+                parts.append('NIX' if tag == 0 else 'QUEST_ITEM')
                 p += 1
             else:
-                parts.append('tag 0x%02X ...' % tag)
+                parts.append('tag 0x%02X, ...' % tag)
                 break
     except (ValueError, struct.error):
         return ''
@@ -278,7 +279,9 @@ def lua_edit(e, funk, names):
         return "        {op = %s, var = '%s', old = 0x%X, new = 0x%X}," % (op, e['var'], e['old'], e['new'])
     note = e.get('note') or ''
     head = ("fn = '%s', " % e['fn'] if funk else '') + 'op = %s, ins = %d' % (op, e['ins'])
-    text = "        {%s, at = %d, old = '%s', new = '%s'}," % (head, e['at'], e['old'], e['new'])
+    def raw(h):                     # a single byte that is a known operand tag is written by name
+        return 'TAG.%s' % TAG_NAMES[int(h, 16)] if len(h) == 2 and int(h, 16) in TAG_NAMES else "'%s'" % h
+    text = "        {%s, at = %d, old = %s, new = %s}," % (head, e['at'], raw(e['old']), raw(e['new']))
     return (('        -- %s\n' % note) if note else '') + text
 
 
