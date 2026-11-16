@@ -25,6 +25,18 @@ OP_NAMES = {51: 'FillSector', 8: 'CreateObj'}
 FILLSECTOR_HEADER = 40      # bytes before the spawn table in a FillSector instruction (checked against every file)
 TAG_SPAWN = 0x19
 TRIPLE = 13
+# the 40 byte header of a FillSector instruction: 4 byte instruction header, then tagged operands (offsets in the instruction)
+FILLSECTOR_FIELDS = [('creature value', 5), ('sector X', 10), ('sector Y', 14), ('min count', 19), ('max count', 23), ('area divisor', 27),
+                     ('min level', 32), ('max level', 36)]
+
+
+def header_note(a, b, off, rel):
+    """'sector X 73 -> 72' for the FillSector header fields among the changed bytes `rel` (offsets in the instruction)."""
+    parts = []
+    for name, at in FILLSECTOR_FIELDS:
+        if any(at <= r < at + 4 for r in rel):
+            parts.append('%s %d -> %d' % (name, struct.unpack_from('<i', a, off + at)[0], struct.unpack_from('<i', b, off + at)[0]))
+    return ', '.join(parts)
 
 
 def spawn_table(raw):
@@ -66,14 +78,19 @@ def edits_funk(a, b, vectoren):
         name = fns[k][0]
         if names[name] != 1:
             raise SystemExit('function name %s is not unique' % name)
-        edit = {'fn': name, 'ins': j + 1, 'op': op}
-        if op == OP_FILLSECTOR and is_spawn_tail(a, b, off, length) and min(rel) >= FILLSECTOR_HEADER:
-            lo = FILLSECTOR_HEADER
-            edit['spawn'] = {'old': spawn_table(a[off + lo:off + length]), 'new': spawn_table(b[off + lo:off + length])}
-        else:
-            lo, hi = min(rel), max(rel) + 1
-            edit.update(at=lo, old=a[off + lo:off + hi].hex(), new=b[off + lo:off + hi].hex())
-        out.append(edit)
+        if op == OP_FILLSECTOR and is_spawn_tail(a, b, off, length):
+            head = [r for r in rel if r < FILLSECTOR_HEADER]
+            if head:
+                lo, hi = min(head), max(head) + 1
+                out.append({'fn': name, 'ins': j + 1, 'op': op, 'at': lo, 'old': a[off + lo:off + hi].hex(), 'new': b[off + lo:off + hi].hex(),
+                            'note': 'FillSector header: ' + header_note(a, b, off, head)})
+            if any(r >= FILLSECTOR_HEADER for r in rel):
+                lo = FILLSECTOR_HEADER
+                out.append({'fn': name, 'ins': j + 1, 'op': op,
+                            'spawn': {'old': spawn_table(a[off + lo:off + length]), 'new': spawn_table(b[off + lo:off + length])}})
+            continue
+        lo, hi = min(rel), max(rel) + 1
+        out.append({'fn': name, 'ins': j + 1, 'op': op, 'at': lo, 'old': a[off + lo:off + hi].hex(), 'new': b[off + lo:off + hi].hex()})
     return out
 
 
@@ -149,7 +166,7 @@ def lua_edit(e, funk):
         return ("        {%s,   -- %s\n"
                 "         spawn = {old = %s,\n"
                 "                  new = %s}},") % (head, name, lua_table(e['spawn']['old']), lua_table(e['spawn']['new']))
-    return "        {%s, at = %d, old = '%s', new = '%s'},   -- %s" % (head, e['at'], e['old'], e['new'], name)
+    return "        {%s, at = %d, old = '%s', new = '%s'},   -- %s" % (head, e['at'], e['old'], e['new'], e.get('note', name))
 
 
 def lua_file(title, edits, funk):
