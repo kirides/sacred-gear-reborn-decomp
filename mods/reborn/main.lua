@@ -157,6 +157,7 @@ local SLOT_KEYS = {[0x31] = 0, [0x32] = 1, [0x33] = 2, [0x34] = 3, [0x35] = 4,
 gear.on('skillslot.key', function(character)
     local k = SLOT_KEYS[character]
     if k then return k end
+    return nil
 end)
 
 gear.on('load', apply_abilities)
